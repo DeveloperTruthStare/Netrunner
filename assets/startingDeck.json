@@ -1,0 +1,42 @@
+{
+  "cards": [
+    {
+      "iconFilePath": "card_icons/jailbreak_icon.jpg",
+      "cardName": "Jailbreak",
+      "cardType": "EVENT",
+      "cost": 0,
+      "cardText": "Run HQ or R&D. If successful, draw 1 card and whenever you breach the attacked server, access 1 additional card",
+      "ability": {
+        "abilityType": "PASSIVE",
+        "abilityName": "AccessCard",
+        "value": 1,
+        "uses": 1,
+        "onFail": {},
+        "onSuccess": {},
+        "destination": "HQ"
+      }
+    },
+    {
+      "iconFilePath": "card_icons/moshing_icon.jpg",
+      "cardName": "Moshing",
+      "cardType": "EVENT",
+      "cost": 0,
+      "cardText": "",
+      "ability": {
+        "abilityType": "ACTIVE",
+        "abilityName": "TrashCard",
+        "value": 3,
+        "uses": 1,
+        "onFail": {},
+        "onSuccess": {
+          "abilityType": "PASSIVE",
+          "abilityName": "DrawCard",
+          "value": 3,
+          "uses": 1,
+          "onFail": {},
+          "onSuccess": {}
+        }
+      }
+    }
+  ]
+}
