@@ -13,15 +13,6 @@ public class RootApplication extends Game {
 	public InputProcessor inputProcessor = new InputProcessor() {
 		@Override
 		public boolean keyDown(int keycode) {
-			System.out.println(keycode);
-			System.out.println(gameState.player.currentCardToDisplay);
-			if (keycode == Input.Keys.SPACE) {
-				gameState.player.currentCardToDisplay++;
-				if (gameState.player.currentCardToDisplay == gameState.player.deck.cards.size()) {
-					gameState.player.currentCardToDisplay = 0;
-				}
-				gameScreen.setGameState(gameState);
-			}
 			return false;
 		}
 
@@ -37,6 +28,9 @@ public class RootApplication extends Game {
 
 		@Override
 		public boolean touchDown(int screenX, int screenY, int pointer, int button) {
+			System.out.println(screenX + ", " + screenY);
+			gameState.player.health--;
+			gameScreen.hpView.setHealth(gameState.player.health);
 			return false;
 		}
 

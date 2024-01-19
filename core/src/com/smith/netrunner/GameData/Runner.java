@@ -18,9 +18,11 @@ public class Runner {
     public Card identityCard;
     public int money;
     public int health;
-    public int currentCardToDisplay;
+    public Runner() {
+        this.money = 50;
+        this.health = 10;
+    }
     public void loadCards() {
-        currentCardToDisplay = 0;
         try {
             String text = new String(Files.readAllBytes(Paths.get("startingDeck.json")), StandardCharsets.UTF_8);
             this.deck = new ObjectMapper().readValue(text, CardCollection.class);
