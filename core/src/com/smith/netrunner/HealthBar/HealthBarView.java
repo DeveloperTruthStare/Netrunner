@@ -6,9 +6,9 @@ import com.smith.netrunner.RootApplication;
 public class HealthBarView {
     private RootApplication app;
     private int health;
-    private Texture playerHealthBar;
-    private Texture heartIcon;
-    private Texture brokenHeartIcon;
+    private final Texture playerHealthBar;
+    private final Texture heartIcon;
+    private final Texture brokenHeartIcon;
 
 
     public HealthBarView(RootApplication app) {
@@ -26,8 +26,9 @@ public class HealthBarView {
         for(int i = 0; i < 10; ++i) {
             Texture toDraw = brokenHeartIcon;
             if (i >= 10 - health)
-                toDraw = heartIcon;
-            app.batch.draw(toDraw, 35 + (i*44 ), 1010, 40, 40);
+                app.batch.draw(heartIcon, 35 + (i*44 ), 1010, 40, 40);
+            else
+                app.batch.draw(heartIcon, 35 + (i*44 ), 1010, 40, 40);
         }
 
     }

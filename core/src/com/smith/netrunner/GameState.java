@@ -16,15 +16,7 @@ public class GameState {
         player.loadCards();
     }
     public void CheckPassives() {
-        for (Card card : player.hardware) {
-            CheckPassive(card);
-        }
-        for (Card card : player.programs) {
-            CheckPassive(card);
-        }
-        for (Card card : player.resources) {
-            CheckPassive(card);
-        }
+
     }
     public void CheckPassive(Card card) {
 

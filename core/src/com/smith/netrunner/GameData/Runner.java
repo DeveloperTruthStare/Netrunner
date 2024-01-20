@@ -12,9 +12,6 @@ public class Runner {
     public CardCollection deck;
     public CardCollection hand;
     public CardCollection discardPile;
-    public ArrayList<Card> programs;
-    public ArrayList<Card> hardware;
-    public ArrayList<Card> resources;
     public Card identityCard;
     public int money;
     public int health;

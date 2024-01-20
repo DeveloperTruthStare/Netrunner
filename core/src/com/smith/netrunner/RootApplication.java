@@ -2,32 +2,34 @@ package com.smith.netrunner;
 
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputProcessor;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.utils.ScreenUtils;
+import com.smith.netrunner.Screens.BaseGameObject;
 import com.smith.netrunner.Screens.GameScreen;
 
 public class RootApplication extends Game {
 	public InputProcessor inputProcessor = new InputProcessor() {
 		@Override
 		public boolean keyDown(int keycode) {
+			currentScreen.keyDown(keycode);
 			return false;
 		}
 
 		@Override
 		public boolean keyUp(int keycode) {
+			currentScreen.keyUp(keycode);
 			return false;
 		}
 
 		@Override
 		public boolean keyTyped(char character) {
+			currentScreen.keyTyped(character);
 			return false;
 		}
 
 		@Override
 		public boolean touchDown(int screenX, int screenY, int pointer, int button) {
+			currentScreen.touchDown(screenX, screenY, pointer, button);
 			System.out.println(screenX + ", " + screenY);
 			gameState.player.health--;
 			gameScreen.hpView.setHealth(gameState.player.health);
@@ -36,32 +38,39 @@ public class RootApplication extends Game {
 
 		@Override
 		public boolean touchUp(int screenX, int screenY, int pointer, int button) {
+			currentScreen.touchUp(screenX, screenY, pointer, button);
 			return false;
 		}
 
 		@Override
 		public boolean touchCancelled(int screenX, int screenY, int pointer, int button) {
+			currentScreen.touchCancelled(screenX, screenY, pointer, button);
 			return false;
 		}
 
 		@Override
 		public boolean touchDragged(int screenX, int screenY, int pointer) {
+			currentScreen.touchDragged(screenX, screenY, pointer);
 			return false;
 		}
 
 		@Override
 		public boolean mouseMoved(int screenX, int screenY) {
+			currentScreen.mouseMoved(screenX, 1080 - screenY);
 			return false;
 		}
 
 		@Override
 		public boolean scrolled(float amountX, float amountY) {
+
+			currentScreen.scrolled(amountX, amountY);
 			return false;
 		}
 	};
 	public SpriteBatch batch;
 	private GameState gameState;
 	private GameScreen gameScreen;
+	private BaseGameObject currentScreen;
 	@Override
 	public void create () {
 		Gdx.input.setInputProcessor(inputProcessor);
@@ -69,8 +78,8 @@ public class RootApplication extends Game {
 		gameState = new GameState();
 		gameScreen = new GameScreen(this, gameState);
 		setScreen(gameScreen);
+		currentScreen = gameScreen;
 	}
-
 	@Override
 	public void dispose () {
 		batch.dispose();
