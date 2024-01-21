@@ -29,7 +29,7 @@ public class IceBreakerView extends BaseGameObject {
         this.positionInHardwareRig = positionInHardwareRig;
         this.iceBreaker.setStrength(positionInHardwareRig);
         this.x = 150 + positionInHardwareRig*200;
-        this.y = 100;
+        this.y = 250;
         this.width = 200;
         this.height = 300;
         defaultIB = new Texture("card_icons/default_ice_breaker.png");
@@ -72,8 +72,6 @@ public class IceBreakerView extends BaseGameObject {
     public void draw(float dt) {
         stage.act();
         stage.draw();
-
-//        app.batch.draw(defaultIB, this.x, this.y, 100, 150, 200, 300, 1, 1, 0.5f);
 
         font.getData().setScale(2, 2);
         // Draw Bottom bar text
