@@ -4,7 +4,6 @@ import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.smith.netrunner.Screens.BaseGameObject;
 import com.smith.netrunner.Screens.GameScreen;
 
 public class RootApplication extends Game {
@@ -30,9 +29,6 @@ public class RootApplication extends Game {
 		@Override
 		public boolean touchDown(int screenX, int screenY, int pointer, int button) {
 			currentScreen.touchDown(screenX, screenY, pointer, button);
-			System.out.println(screenX + ", " + screenY);
-			gameState.player.health--;
-			gameScreen.hpView.setHealth(gameState.player.health);
 			return false;
 		}
 

@@ -6,7 +6,7 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.smith.netrunner.RootApplication;
-import com.smith.netrunner.Screens.BaseGameObject;
+import com.smith.netrunner.BaseGameObject;
 
 public class IceBreakerView extends BaseGameObject {
     private RootApplication app;

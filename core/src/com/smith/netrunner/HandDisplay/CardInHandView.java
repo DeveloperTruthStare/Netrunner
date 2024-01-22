@@ -1,7 +1,7 @@
 package com.smith.netrunner.HandDisplay;
 
 import com.smith.netrunner.RootApplication;
-import com.smith.netrunner.Screens.BaseGameObject;
+import com.smith.netrunner.BaseGameObject;
 
 public class CardInHandView extends BaseGameObject {
     public CardInHandView(RootApplication app) {

@@ -8,17 +8,15 @@ import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.smith.netrunner.GameData.Card;
 import com.smith.netrunner.RootApplication;
-import com.smith.netrunner.Screens.BaseGameObject;
+import com.smith.netrunner.BaseGameObject;
 
 import java.util.ArrayList;
 
 public class HandDisplay extends BaseGameObject {
     public ArrayList<Card> cardsInHand;
-    private boolean detailedCard = false;
-    private int minX, maxX, minY, minimizedHeight;
-    private Texture cardTexture;
-    private ArrayList<Image> cardImages;
-    private Stage stage;
+    private final Texture cardTexture;
+    private final ArrayList<Image> cardImages;
+    private final Stage stage;
     private int cardBeingHovered = -1;
     public HandDisplay(RootApplication app) {
         super(app);
