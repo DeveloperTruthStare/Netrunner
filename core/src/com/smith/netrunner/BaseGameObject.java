@@ -5,11 +5,19 @@ import java.util.ArrayList;
 public class BaseGameObject {
     protected RootApplication app;
     protected ArrayList<BaseGameObject> children;
+    protected int x = 0, y = 0, width = 0, height = 0;
     public BaseGameObject(RootApplication app) {
         this.app = app;
         children = new ArrayList<>();
     }
-
+    public void setPosition(int x, int y) {
+        this.x = x;
+        this.y = y;
+    }
+    public void setSize(int width, int height) {
+        this.width = width;
+        this.height = height;
+    }
     public void addListener(BaseGameObject child) {
         if (!this.children.contains(child))
             this.children.add(child);

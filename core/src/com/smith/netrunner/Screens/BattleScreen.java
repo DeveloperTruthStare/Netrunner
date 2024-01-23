@@ -9,6 +9,7 @@ import com.smith.netrunner.BaseGameObject;
 import com.smith.netrunner.GameData.Card;
 import com.smith.netrunner.GameData.IHoverableCallback;
 import com.smith.netrunner.HandDisplay.HandDisplay;
+import com.smith.netrunner.HardwareRig.DefaultIceBreaker;
 import com.smith.netrunner.HardwareRig.HardwareRig;
 import com.smith.netrunner.HealthBar.HealthBarView;
 import com.smith.netrunner.InfoWindow.InfoWindow;
@@ -21,6 +22,7 @@ public class BattleScreen extends BaseGameObject implements Screen, IHoverableCa
     private final HealthBarView hpView;
     private final Stage stage;
     private final HardwareRig hardwareRig;
+    private String currentAction;
 
     public BattleScreen(RootApplication app) {
         super(app);
@@ -28,8 +30,13 @@ public class BattleScreen extends BaseGameObject implements Screen, IHoverableCa
         handDisplay = new HandDisplay(app);
         hpView = new HealthBarView(app);
         stage = new Stage();
-        Image hardwareBackground = new Image(new Texture("fightBackgroundLabel.png"));
+
+        Image hardwareBackground = new Image(new Texture("BattleScreen/battleBackground.png"));
         stage.addActor(hardwareBackground);
+
+        Image bannerTexture = new Image(new Texture("BattleScreen/battleBanner.png"));
+        bannerTexture.setPosition(0, 980);
+        stage.addActor(bannerTexture);
         hardwareRig = new HardwareRig(app);
 
         addListener(hardwareRig);
@@ -42,7 +49,6 @@ public class BattleScreen extends BaseGameObject implements Screen, IHoverableCa
         handDisplay.draw(delta);
         hardwareRig.draw(delta);
     }
-
 
     @Override
     public void show() {
@@ -81,6 +87,7 @@ public class BattleScreen extends BaseGameObject implements Screen, IHoverableCa
     @Override
     public void mouseMoved(int screenX, int screenY) {
         super.mouseMoved(screenX, screenY);
+        System.out.println(screenX + ", " + screenY);
         handDisplay.mouseMoved(screenX, screenY);
     }
     @Override
@@ -89,6 +96,8 @@ public class BattleScreen extends BaseGameObject implements Screen, IHoverableCa
         if (keycode == Input.Keys.SPACE) {
             // Add a new card
             handDisplay.addToHand(new Card());
+        } else if (keycode == Input.Keys.Q) {
+            hardwareRig.installOnHovered(new DefaultIceBreaker(this.app));
         }
     }
 }

@@ -47,6 +47,13 @@ public class HandDisplay extends BaseGameObject {
             }
         }
     }
+
+    @Override
+    public void touchDown(int screenX, int screenY, int pointer, int button) {
+        super.touchDown(screenX, screenY, pointer, button);
+
+    }
+
     public void addToHand(Card card) {
         // TODO Animate this
         cardsInHand.add(card);
@@ -73,24 +80,25 @@ public class HandDisplay extends BaseGameObject {
         int yVal = startingY * 50;
 
         for(int i = 0; i < cardsInHand.size(); ++i) {
-            if (cardBeingHovered != i){
-                cardImages.get(i).setVisible(true);
-                yVal = Math.max(-50, yVal);
-                yVal = Math.min(yVal, -10);
+            yVal = Math.max(-50, yVal);
+            yVal = Math.min(yVal, -10);
 
-                cardImages.get(i).setPosition(minW + (i * wPerCard), yVal-20);
-
-                cardImages.get(i).setRotation(minRotation + (rotationPerCard * i));
-
-
-                if (i < midPoint) {
-                    yVal += 10;
-                } else if (i > midPoint || cardsInHand.size() % 2 == 1) {
-                    yVal -= 10;
-                }
-            } else {
-                cardImages.get(i).setVisible(false);
+            cardImages.get(i).setPosition(minW + (i * wPerCard), yVal-20);
+            cardImages.get(i).setSize(200, 300);
+            cardImages.get(i).setZIndex(i);
+            cardImages.get(i).setRotation(minRotation + (rotationPerCard * i));
+            if (i < midPoint) {
+                yVal += 10;
+            } else if (i > midPoint || cardsInHand.size() % 2 == 1) {
+                yVal -= 10;
             }
+        }
+        if (cardBeingHovered != -1) {
+            cardImages.get(cardBeingHovered).setZIndex(100);
+            cardImages.get(cardBeingHovered).setSize(300, 450);
+            cardImages.get(cardBeingHovered).setPosition(minW + (cardBeingHovered * wPerCard), 0);
+            cardImages.get(cardBeingHovered).setRotation(0);
+
         }
         stage.draw();
     }
