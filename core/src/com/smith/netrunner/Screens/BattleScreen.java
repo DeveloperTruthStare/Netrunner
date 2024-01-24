@@ -16,20 +16,39 @@ import com.smith.netrunner.InfoWindow.InfoWindow;
 import com.smith.netrunner.RootApplication;
 
 public class BattleScreen extends BaseGameObject implements Screen, IHoverableCallback {
-
+    public class BattleState {
+        private int maxCycles = 3;
+        public int curCycles = 3;
+        public boolean canPerformAction(int cost) {
+            return cost >= curCycles;
+        }
+        public void startPlayerTurn() {
+            curCycles = maxCycles;
+        }
+    }
     private final InfoWindow infoWindow;
     private final HandDisplay handDisplay;
     private final HealthBarView hpView;
     private final Stage stage;
     private final HardwareRig hardwareRig;
     private String currentAction;
+    private final Texture[] cyclesTexture;
+    private final BattleState battleState;
 
     public BattleScreen(RootApplication app) {
         super(app);
+        battleState = new BattleState();
         infoWindow = new InfoWindow(app);
         handDisplay = new HandDisplay(app);
         hpView = new HealthBarView(app);
         stage = new Stage();
+
+        cyclesTexture = new Texture[4];
+        cyclesTexture[0] = new Texture("CycleCounter/0x3Cycles.png");
+        cyclesTexture[1] = new Texture("CycleCounter/1x3Cycles.png");
+        cyclesTexture[2] = new Texture("CycleCounter/2x3Cycles.png");
+        cyclesTexture[3] = new Texture("CycleCounter/3x3Cycles.png");
+
 
         Image hardwareBackground = new Image(new Texture("BattleScreen/battleBackground.png"));
         stage.addActor(hardwareBackground);
@@ -48,6 +67,9 @@ public class BattleScreen extends BaseGameObject implements Screen, IHoverableCa
         hpView.draw(delta);
         handDisplay.draw(delta);
         hardwareRig.draw(delta);
+
+        // Draw remaining Cycles Texture
+        app.batch.draw(cyclesTexture[battleState.curCycles], 0, 0);
     }
 
     @Override

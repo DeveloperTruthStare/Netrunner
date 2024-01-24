@@ -13,6 +13,7 @@ import com.smith.netrunner.BaseGameObject;
 import java.util.ArrayList;
 
 public class HandDisplay extends BaseGameObject {
+    public static final int MAX_WIDTH = 1300;
     public ArrayList<Card> cardsInHand;
     private final Texture cardTexture;
     private final ArrayList<Image> cardImages;
@@ -32,7 +33,7 @@ public class HandDisplay extends BaseGameObject {
 
     @Override
     public void mouseMoved(int x, int y) {
-        float width = Math.min(1620, 100 * cardsInHand.size());
+        float width = Math.min(MAX_WIDTH, 100 * cardsInHand.size());
         float wPerCard = width / Math.max(1, cardsInHand.size()-1);
         float minW = 885 - width/2;
         if (y > 260 || x < minW || x > minW + width + wPerCard) {
@@ -71,7 +72,7 @@ public class HandDisplay extends BaseGameObject {
         float maxRotation = -minRotation;
         float rotationPerCard = (maxRotation - minRotation) / Math.max(1, cardsInHand.size() - 1);
 
-        float width = Math.min(1620, 100 * cardsInHand.size());
+        float width = Math.min(MAX_WIDTH, 100 * cardsInHand.size());
         float wPerCard = width / Math.max(1, cardsInHand.size()-1);
         float minW = 885 - width/2;
 
