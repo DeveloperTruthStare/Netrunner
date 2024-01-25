@@ -3,6 +3,7 @@ package com.smith.netrunner.HandDisplay;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
@@ -49,12 +50,6 @@ public class HandDisplay extends BaseGameObject {
         }
     }
 
-    @Override
-    public void touchDown(int screenX, int screenY, int pointer, int button) {
-        super.touchDown(screenX, screenY, pointer, button);
-
-    }
-
     public void addToHand(Card card) {
         // TODO Animate this
         cardsInHand.add(card);
@@ -63,6 +58,26 @@ public class HandDisplay extends BaseGameObject {
         image.setOrigin((float) cardTexture.getWidth() /2, (float) cardTexture.getHeight() /2);
         cardImages.add(image);
         stage.addActor(image);
+    }
+    public Card getHoveredCard() {
+        if (-1 == cardBeingHovered) return null;
+        return cardsInHand.get(cardBeingHovered);
+    }
+    public void unHoverCard() {
+        this.cardBeingHovered = -1;
+    }
+    public Card removeHoveredCard() {
+        if (-1 == cardBeingHovered) return null;
+        // Remove from arrays
+        Card card = cardsInHand.remove(cardBeingHovered);
+        Image removedCard = cardImages.remove(cardBeingHovered);
+        for(Actor actor : stage.getActors()) {
+            if (actor == removedCard) {
+                actor.remove();
+            }
+        }
+        cardBeingHovered = -1;
+        return card;
     }
 
     public void draw(float delta) {

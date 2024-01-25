@@ -3,7 +3,7 @@ package com.smith.netrunner.HardwareRig;
 import com.badlogic.gdx.graphics.Texture;
 import com.smith.netrunner.RootApplication;
 
-public class DefaultIceBreaker extends Hardware {
+public class DefaultIceBreaker extends HardwareView {
     private static Texture defaultIceBreaker;
     public DefaultIceBreaker(RootApplication app) {
         super(app);

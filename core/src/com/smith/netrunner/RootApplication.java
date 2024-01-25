@@ -5,6 +5,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.smith.netrunner.Screens.GameScreen;
+import com.smith.netrunner.Screens.TitleScreen;
 
 public class RootApplication extends Game {
 	public InputProcessor inputProcessor = new InputProcessor() {
@@ -65,6 +66,7 @@ public class RootApplication extends Game {
 	};
 	public SpriteBatch batch;
 	private GameState gameState;
+	private TitleScreen titleScreen;
 	private GameScreen gameScreen;
 	private BaseGameObject currentScreen;
 	@Override
@@ -73,6 +75,11 @@ public class RootApplication extends Game {
 		batch = new SpriteBatch();
 		gameState = new GameState();
 		gameScreen = new GameScreen(this, gameState);
+		titleScreen = new TitleScreen(this);
+		setScreen(titleScreen);
+		currentScreen = titleScreen;
+	}
+	public void startGame() {
 		setScreen(gameScreen);
 		currentScreen = gameScreen;
 	}

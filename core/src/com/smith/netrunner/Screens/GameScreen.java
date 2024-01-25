@@ -22,7 +22,7 @@ public class GameScreen extends BaseGameObject implements Screen {
         this.gameState = gameState;
         this.gameState = new GameState();
         battleScreen = new BattleScreen(root);
-        this.addListener(battleScreen);
+        this.addChild(battleScreen);
 
         background = new Texture("Concept_Art_Game_Board.png");
     }
