@@ -37,13 +37,15 @@ public class HardwareView extends BaseGameObject {
     public boolean getHoveredStatus() {
         return hovered;
     }
+    public Card getInstalledHardware() {
+        return this.card;
+    }
 
     @Override
     public void draw(float delta) {
         super.draw(delta);
         if (!isActive) return;
         if (null == card) {
-
             if (hovered)
                 app.batch.draw(hoveredHardwareImage, this.x, this.y);
             else

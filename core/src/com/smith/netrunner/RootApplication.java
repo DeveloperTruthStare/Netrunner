@@ -3,6 +3,7 @@ package com.smith.netrunner;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputProcessor;
+import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.smith.netrunner.Screens.GameScreen;
 import com.smith.netrunner.Screens.TitleScreen;
@@ -83,6 +84,7 @@ public class RootApplication extends Game {
 		setScreen(gameScreen);
 		currentScreen = gameScreen;
 	}
+
 	@Override
 	public void dispose () {
 		batch.dispose();

@@ -12,7 +12,6 @@ import java.util.ArrayList;
 public class HardwareRig extends BaseGameObject {
     protected int hardwareLength = 4;
     private final ArrayList<HardwareView> baseHardwareViews;
-
     private final int imageHeight = 200;
     private final int bottomRightX = 5, bottomRightY = 180;
     private final Image hardwareRig;
@@ -48,12 +47,10 @@ public class HardwareRig extends BaseGameObject {
         return hoveredHardware;
     }
     public boolean installOnHovered(Card hardware) {
-        // Assume
-        // - valid hardware card is provided
-        // - Hovered isn't already occupied
+        if (hardware.cardType != Card.CardType.HARDWARE) return false;
         int hoveredHardware = getHoveredHardware();
-        if (-1 == hoveredHardware)
-            return false;
+        if (-1 == hoveredHardware) return false;
+        if (null != baseHardwareViews.get(hoveredHardware).getInstalledHardware()) return false;
         baseHardwareViews.get(hoveredHardware).setCard(hardware);
 
         return true;

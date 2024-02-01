@@ -9,43 +9,20 @@ import com.smith.netrunner.RootApplication;
 import com.smith.netrunner.Screens.TitleScreen;
 
 public class Button extends BaseGameObject {
-    public class MyShapeRenderer extends ShapeRenderer{
-        /**
-         * Draws a rectangle with rounded corners of the given radius.
-         */
-        public void roundedRect(float x, float y, float width, float height, float radius){
-            // Central rectangle
-            super.rect(x + radius, y + radius, width - 2*radius, height - 2*radius);
-
-            // Four side rectangles, in clockwise order
-            super.rect(x + radius, y, width - 2*radius, radius);
-            super.rect(x + width - radius, y + radius, radius, height - 2*radius);
-            super.rect(x + radius, y + height - radius, width - 2*radius, radius);
-            super.rect(x, y + radius, radius, height - 2*radius);
-
-            // Four arches, clockwise too
-            super.arc(x + radius, y + radius, radius, 180f, 90f);
-            super.arc(x + width - radius, y + radius, radius, 270f, 90f);
-            super.arc(x + width - radius, y + height - radius, radius, 0f, 90f);
-            super.arc(x + radius, y + height - radius, radius, 90f, 90f);
-        }
-    }
     private ClickCallbackListener callback;
     private Rectangle rect;
     private BitmapFont font;
     private MyShapeRenderer shape;
     private String text;
-    private int id;
-    public Button(RootApplication app, ClickCallbackListener callback, int id) {
+    public Button(RootApplication app, ClickCallbackListener callback) {
         super(app);
         this.callback = callback;
         font = new BitmapFont();
         shape = new MyShapeRenderer();
         this.width = 200;
         this.height = 50;
-        this.x = id * (this.width + 10);
+        this.x = 10;
         this.y = 1080 - this.height;
-        this.id = id;
     }
     public void draw(float delta) {
         if (!isActive) return;
@@ -67,6 +44,6 @@ public class Button extends BaseGameObject {
         if(!isActive) return;
         super.touchDown(screenX, screenY, pointer, button);
         if (screenX > this.x && screenX < this.x + this.width && (1080-screenY) > this.y && (1080-screenY) < this.y + this.height)
-            callback.onClick(this.id);
+            callback.onClick();
     }
 }

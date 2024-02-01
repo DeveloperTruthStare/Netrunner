@@ -16,7 +16,7 @@ import java.util.ArrayList;
 public class HandDisplay extends BaseGameObject {
     public static final int MAX_WIDTH = 1300;
     public ArrayList<Card> cardsInHand;
-    private final Texture cardTexture;
+    private Texture cardTexture;
     private final ArrayList<Image> cardImages;
     private final Stage stage;
     private int cardBeingHovered = -1;
@@ -26,10 +26,6 @@ public class HandDisplay extends BaseGameObject {
         stage = new Stage(new ScreenViewport());
         cardImages = new ArrayList<>();
 
-        Pixmap original = new Pixmap(Gdx.files.internal("card_icons/melos.png"));
-        Pixmap resized = new Pixmap(200, 300, original.getFormat());
-        resized.drawPixmap(original, 0, 0, original.getWidth(), original.getHeight(), 0, 0, 200, 300);
-        cardTexture = new Texture(resized);
     }
 
     @Override
@@ -37,7 +33,7 @@ public class HandDisplay extends BaseGameObject {
         float width = Math.min(MAX_WIDTH, 100 * cardsInHand.size());
         float wPerCard = width / Math.max(1, cardsInHand.size()-1);
         float minW = 885 - width/2;
-        if (y > 260 || x < minW || x > minW + width + wPerCard) {
+        if (y > 200 || x < minW || x > minW + width + wPerCard) {
             cardBeingHovered = -1;
         } else {
             for(int i = 0; i < cardsInHand.size(); ++i) {
@@ -53,6 +49,11 @@ public class HandDisplay extends BaseGameObject {
     public void addToHand(Card card) {
         // TODO Animate this
         cardsInHand.add(card);
+        Pixmap original = new Pixmap(Gdx.files.internal(card.iconFilePath));
+        Pixmap resized = new Pixmap(200, 300, original.getFormat());
+        resized.drawPixmap(original, 0, 0, original.getWidth(), original.getHeight(), 0, 0, 200, 300);
+        cardTexture = new Texture(resized);
+
         Image image = new Image(cardTexture);
         image.setSize(200, 300);
         image.setOrigin((float) cardTexture.getWidth() /2, (float) cardTexture.getHeight() /2);
@@ -87,26 +88,26 @@ public class HandDisplay extends BaseGameObject {
         float maxRotation = -minRotation;
         float rotationPerCard = (maxRotation - minRotation) / Math.max(1, cardsInHand.size() - 1);
 
-        float width = Math.min(MAX_WIDTH, 100 * cardsInHand.size());
-        float wPerCard = width / Math.max(1, cardsInHand.size()-1);
+        float width = Math.min(MAX_WIDTH, 125 * cardsInHand.size());
+        float wPerCard = width / Math.max(1, cardsInHand.size());
         float minW = 885 - width/2;
 
-        int startingY = -(cardsInHand.size()-1)/2;
-        int midPoint = -startingY;
-        int yVal = startingY * 50;
+        int heightDiff = 50;
+
+        int halfCards = (cardsInHand.size()-1)/2;
+        int step = heightDiff / Math.max(1, ((cardsInHand.size()+1)/2));
+        int yVal = -heightDiff;
+        int yOffset = -100;
 
         for(int i = 0; i < cardsInHand.size(); ++i) {
-            yVal = Math.max(-50, yVal);
-            yVal = Math.min(yVal, -10);
-
-            cardImages.get(i).setPosition(minW + (i * wPerCard), yVal-20);
+            cardImages.get(i).setPosition(minW + (i * wPerCard), yVal + yOffset);
             cardImages.get(i).setSize(200, 300);
             cardImages.get(i).setZIndex(i);
             cardImages.get(i).setRotation(minRotation + (rotationPerCard * i));
-            if (i < midPoint) {
-                yVal += 10;
-            } else if (i > midPoint || cardsInHand.size() % 2 == 1) {
-                yVal -= 10;
+            if (i < halfCards) {
+                yVal += step;
+            } else if (i > halfCards || cardsInHand.size() % 2 == 1) {
+                yVal -= step;
             }
         }
         if (cardBeingHovered != -1) {

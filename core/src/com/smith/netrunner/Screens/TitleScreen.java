@@ -13,8 +13,26 @@ public class TitleScreen extends BaseGameObject implements Screen, ClickCallback
 
     public TitleMenuState state;
     private final Button startButton;
+    private final ClickCallbackListener onStartClick = new ClickCallbackListener() {
+        @Override
+        public void onClick() {
+            app.startGame();
+        }
+    };
     private final Button quitButton;
+    private final ClickCallbackListener onQuitClick = new ClickCallbackListener() {
+        @Override
+        public void onClick() {
+
+        }
+    };
     private final Button settingsButton;
+    private final ClickCallbackListener onSettingsClick = new ClickCallbackListener() {
+        @Override
+        public void onClick() {
+
+        }
+    };
     private final BaseGameObject mainMenu;
     public TitleScreen(RootApplication app) {
         super(app);
@@ -22,15 +40,15 @@ public class TitleScreen extends BaseGameObject implements Screen, ClickCallback
 
         mainMenu = new BaseGameObject(app);
 
-        startButton = new Button(app, this, 0);
+        startButton = new Button(app, onStartClick);
         startButton.setPosition(1670, 540);
         mainMenu.addChild(startButton);
 
-        quitButton = new Button(app, this, 1);
+        quitButton = new Button(app, onQuitClick);
         quitButton.setPosition(1670, 390);
         mainMenu.addChild(quitButton);
 
-        settingsButton = new Button(app, this, 2);
+        settingsButton = new Button(app, onSettingsClick);
         settingsButton.setPosition(1670, 465);
         mainMenu.addChild(settingsButton);
 
@@ -80,24 +98,5 @@ public class TitleScreen extends BaseGameObject implements Screen, ClickCallback
     @Override
     public void dispose() {
 
-    }
-
-    @Override
-    public void onClick(int id) {
-        switch(id) {
-            case 0:
-                // Start Button
-                mainMenu.setActive(false);
-                app.startGame();
-                break;
-            case 1:
-                // Settings Button
-                mainMenu.setActive(false);
-                break;
-            case 2:
-                // Quit Button
-
-                break;
-        }
     }
 }

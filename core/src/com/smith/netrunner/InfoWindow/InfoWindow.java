@@ -1,33 +1,45 @@
 package com.smith.netrunner.InfoWindow;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.GlyphLayout;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.smith.netrunner.BaseGameObject;
 import com.smith.netrunner.RootApplication;
 
-public class InfoWindow {
-    private RootApplication app;
-    private boolean visible = false;
-    private int x, y;
-    private String data;
+public class InfoWindow extends BaseGameObject {
+    private String data = "";
     BitmapFont font;
+    MyShapeRenderer shapeRenderer;
+    GlyphLayout layout;
+
     public InfoWindow(RootApplication app) {
-        this.app = app;
+        super(app);
         font = new BitmapFont();
-    }
-    public void setVisible(boolean visible) {
-        this.visible = visible;
+        shapeRenderer = new MyShapeRenderer();
+        layout = new GlyphLayout(font, data);
     }
     public void setData(String data) {
         this.data = data;
+        layout.setText(font, data);
     }
-    public void setMousePosition(int x, int y) {
-        this.x = x;
-        this.y = y;
-    }
+    @Override
     public void draw(float dt) {
-        if (!this.visible) return;
-        // Draw Background window
+        super.draw(dt);
+        if (!this.isActive) return;
 
+        // Draw Background window
+        app.batch.end();
+        Gdx.gl.glEnable(GL20.GL_BLEND);
+        Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
+
+        shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
+        shapeRenderer.setColor(0, 0, 0, 0.5f);
+        shapeRenderer.roundedRect(this.x, this.y, this.width, this.height, 20);
+        shapeRenderer.end();
+        app.batch.begin();
         // Draw text info
-        font.draw(app.batch, this.data, this.x, this.y);
+        font.draw(app.batch, layout, this.x + (this.width - layout.width)/2, this.y + (this.height + layout.height)/2);
     }
 }

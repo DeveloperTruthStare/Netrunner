@@ -23,6 +23,7 @@ public class Card {
         card.cardType = CardType.HARDWARE;
         card.cardSubType = CardSubType.ICE_BREAKER;
         card.cost = 1;
+        card.iconFilePath = "card_icons/redCard.png";
         return card;
     }
     public static Card GenerateConsole() {
@@ -30,6 +31,7 @@ public class Card {
         card.cardType = CardType.HARDWARE;
         card.cardSubType = CardSubType.CONSOLE;
         card.cost = 1;
+        card.iconFilePath = "card_icons/blueCard.png";
         return card;
     }
     public static Card GenerateEvent() {
@@ -37,6 +39,7 @@ public class Card {
         card.cardType = CardType.EVENT;
         card.cardSubType = CardSubType.RUN;
         card.cost = 1;
+        card.iconFilePath = "card_icons/greenCard.png";
         return card;
     }
     public static Card GenerateRandomCard() {
