@@ -1,82 +1,61 @@
 package com.smith.netrunner.Screens;
 
-import com.badlogic.gdx.Input;
-import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
+import com.smith.netrunner.BackgroundManager;
 import com.smith.netrunner.BaseGameObject;
-import com.smith.netrunner.Corporation.ResearchAndDevelopment;
+import com.smith.netrunner.Corporation.Corporation;
 import com.smith.netrunner.Corporation.RunTarget;
+import com.smith.netrunner.GameData.BattleState;
 import com.smith.netrunner.GameData.Card;
+import com.smith.netrunner.GameData.Deck;
 import com.smith.netrunner.GameData.IHoverableCallback;
 import com.smith.netrunner.HandDisplay.HandDisplay;
-import com.smith.netrunner.HardwareRig.DefaultIceBreaker;
 import com.smith.netrunner.HardwareRig.HardwareRig;
 import com.smith.netrunner.HealthBar.HealthBarView;
 import com.smith.netrunner.InfoWindow.InfoWindow;
 import com.smith.netrunner.RootApplication;
-import com.smith.netrunner.Target;
 import com.smith.netrunner.UI.ClickCallbackListener;
 import com.smith.netrunner.UI.ImageButton;
 
-import java.awt.Point;
-import java.awt.geom.Point2D;
 import java.util.ArrayList;
 
-public class BattleScreen extends BaseGameObject implements Screen, IHoverableCallback {
+public class BattleScreen extends BaseGameObject implements IHoverableCallback {
     private ClickCallbackListener onClickEndTurn  = new ClickCallbackListener() {
         @Override
         public void onClick() {
-            battleState.endTurn();
+            if (battleState.getState() == BattleState.STATE.PLAYER_ACTION) {
+                endTurn();
+                if (battleState.turns == 2)
+                    ((GameScreen)parent).quitBattle();
+            }
         }
     };
     private ClickCallbackListener onClickRND = new ClickCallbackListener() {
         @Override
         public void onClick() {
-            battleState.setAction("RUNNING_0");
+            if (battleState.getState() != BattleState.STATE.SELECTING_SERVER) return;
+            battleState.selectServer(0);
+
+            for(RunTarget server : corporationServers) {
+                server.setShowOutline(false);
+            }
+            corporationServers.get(battleState.currentServer).targetServer();
         }
     };
-
-    public class BattleState {
-        private int maxCycles = 3;
-        public int curCycles = 3;
-        public boolean playerTurn = true;
-        public boolean playerPerformingAction = true;
-        public String currentAction = "LOADING";
-        public boolean canPerformAction(Card.CardType action, int cost) {
-            if (cost > curCycles) return false;
-            if (!playerTurn) return false;
-            if (currentAction.startsWith("RUNNING")) {
-                return false;
-            }
-            return true;
-        }
-        public void startPlayerTurn() {
-            curCycles = maxCycles;
-        }
-        public void setAction(String newAction) {
-            currentAction = newAction;
-            for(RunTarget rt : corporationServers) {
-                rt.setAction(newAction);
-            }
-
-            if (newAction.equals("RUNNING")) {
-                // Need to choose target
-                infoWindow.setData("Select Target server to run against");
-                infoWindow.setActive(true);
-                infoWindow.setPosition(1920/2 - 170, 1080/2 - 50);
-                infoWindow.setSize(340, 100);
-            } else {
+    private ClickCallbackListener onInfoClick = new ClickCallbackListener() {
+        @Override
+        public void onClick() {
+            System.out.println("Info Clicked");
+            if (battleState.getState() == BattleState.STATE.ACCEPTING_REWARDS) {
+                battleState.nextState();
                 infoWindow.setActive(false);
+                corporationServers.get(battleState.currentServer).unTarget();
+                battleState.infoToDisplay = "";
             }
         }
-        public void endTurn() {
-            if (!currentAction.startsWith("RUNNING")) {
-                playerTurn = false;
-            }
-        }
-    }
+    };
     private final InfoWindow infoWindow;
     private final HandDisplay handDisplay;
     private final HealthBarView hpView;
@@ -89,16 +68,19 @@ public class BattleScreen extends BaseGameObject implements Screen, IHoverableCa
 
     private final Image bannerImage;
     private int bannerImagexPos = -1920;
-    private int bannerImageSpeed = 5000;
+    private final BackgroundManager background;
+    private final Deck deck;
 
-    RunTarget server;
-    public BattleScreen(RootApplication app) {
-        super(app);
+    public BattleScreen(RootApplication app, GameScreen gameScreen) {
+        super(app, gameScreen);
+        deck = new Deck();
+
+        background = new BackgroundManager(app);
         stage = new Stage();
 
         battleState = new BattleState();
 
-        infoWindow = new InfoWindow(app);
+        infoWindow = new InfoWindow(app, onInfoClick);
 
         hpView = new HealthBarView(app);
 
@@ -118,8 +100,8 @@ public class BattleScreen extends BaseGameObject implements Screen, IHoverableCa
         cyclesTexture[3] = new Texture("CycleCounter/3x3Cycles.png");
 
         // Create Background image and add it to the stage
-        Image hardwareBackground = new Image(new Texture("BattleScreen/battleBackground.png"));
-        stage.addActor(hardwareBackground);
+        //Image hardwareBackground = new Image(new Texture("BattleScreen/battleBackground.png"));
+        //stage.addActor(hardwareBackground);
 
         bannerImage = new Image(new Texture("BattleScreen/battleBanner.png"));
         bannerImage.setPosition(-1920, 980);
@@ -127,23 +109,36 @@ public class BattleScreen extends BaseGameObject implements Screen, IHoverableCa
 
         corporationServers = new ArrayList<>();
 
-        server = new ResearchAndDevelopment(app, onClickRND);
+        RunTarget server = new RunTarget(app, onClickRND);
         server.setPosition(1270, 150);
         addChild(server);
         corporationServers.add(server);
 
         // Add child objects
-
-        addChild(handDisplay);
         addChild(hardwareRig);
+        addChild(handDisplay);
         addChild(endTurnButton);
         addChild(infoWindow);
+    }
+
+    public void reset() {
+        background.reset();
+        hardwareRig.reset();
+        handDisplay.reset();
+        battleState.reset();
+
+        deck.loadDeck(((GameScreen)parent).deck);
+    }
+
+    public void setCorporation(Corporation corp) {
 
     }
 
     @Override
-    public void render(float delta) {
+    public void draw(float delta) {
+        if (!isActive) return;
         // Draw the background
+        background.draw(delta);
         stage.draw();
         hpView.draw(delta);
 
@@ -151,49 +146,111 @@ public class BattleScreen extends BaseGameObject implements Screen, IHoverableCa
         super.draw(delta);
 
         // Draw remaining Cycles Texture
-        app.batch.draw(cyclesTexture[battleState.curCycles], 0, 0);
-
+        app.batch.draw(cyclesTexture[battleState.curCycles], 20, 80);
         update(delta);
+
+        if (!battleState.infoToDisplay.isEmpty()) {
+            infoWindow.setData(battleState.infoToDisplay);
+            infoWindow.setActive(true);
+            infoWindow.setPosition(1920/2 - 170, 1080/2 - 50);
+            infoWindow.setSize(340, 100);
+        }
     }
 
-
     public void update(float delta) {
+        switch(battleState.getState()) {
+            case LOADING:
+                loadingUpdate(delta);
+                break;
+            case DISCARD:
+                discardUpdate(delta);
+                break;
+            case DRAW:
+                drawHandUpdate(delta);
+                break;
+            case PLAYER_ACTION:
+                break;
+            case SELECTING_SERVER:
+                for(RunTarget server : corporationServers) {
+                    server.setShowOutline(true);
+                }
+                break;
+            case DEALING_WITH_ICE:
+                if (corporationServers.get(battleState.currentServer).hasAccess()) {
+                    battleState.nextState();
+                }
+                RunTarget.Ice ice = corporationServers.get(battleState.currentServer).getActiveIce();
+
+                break;
+            case ACCEPTING_REWARDS:
+                // Show window for rewards
+                battleState.infoToDisplay = "Server Access Granted, Here are the rewards";
+                break;
+            case ENEMY_TURN:
+                enemyTurnUpdate(delta);
+                break;
+        }
+
+    }
+    private void enemyTurnUpdate(float delta) {
+        System.out.println("Doing enemy turn");
+        battleState.nextState();
+    }
+    private void loadingUpdate(float delta) {
         updateBannerPosition(delta);
+
+        timeSinceStart += delta;
+        if (timeSinceStart >= 2) {
+            timeSinceStart = 0;
+            battleState.nextState();
+        }
+    }
+    private float timeSinceStart = 0;
+    public void discardUpdate(float delta) {
+        timeSinceStart += delta;
+        // Play Animations here
+
+        if (timeSinceStart > 0.2) {
+            timeSinceStart = 0;
+            Card card = handDisplay.discard();
+            if (card == null) {
+                battleState.nextState();
+            } else {
+                deck.discardCard(card);
+            }
+        }
+    }
+    private int cardsDrawn = 0;
+    private final int cardsToDraw = 5;
+    public void drawHandUpdate(float delta) {
+        timeSinceStart += delta;
+        // Play Animations here
+        if (timeSinceStart > 0.2) {
+            timeSinceStart = 0;
+            Card card = deck.drawFromDeck();
+            if (card == null) {
+                cardsDrawn = 0;
+                battleState.nextState();
+            } else {
+                handDisplay.addToHand(card);
+                cardsDrawn++;
+                if (cardsDrawn == cardsToDraw) {
+                    battleState.nextState();
+                    cardsDrawn = 0;
+                }
+            }
+        }
     }
 
     private void updateBannerPosition(float delta) {
-        if (!battleState.currentAction.equals("LOADING")) return;
+        if (battleState.getState() != BattleState.STATE.LOADING) return;
 
+        int bannerImageSpeed = 5000;
         bannerImagexPos += bannerImageSpeed * delta;
         if (bannerImagexPos >= 0) {
-            battleState.setAction("PLAYER_TURN");
             bannerImagexPos = 0;
         }
         bannerImage.setPosition(bannerImagexPos, 980);
-    }
-    @Override
-    public void show() {
-
-    }
-    @Override
-    public void resize(int width, int height) {
-
-    }
-    @Override
-    public void pause() {
-
-    }
-    @Override
-    public void resume() {
-
-    }
-    @Override
-    public void hide() {
-
-    }
-    @Override
-    public void dispose() {
-
     }
 
     public void onHover(String dataToDisplay, int x, int y) {
@@ -224,7 +281,8 @@ public class BattleScreen extends BaseGameObject implements Screen, IHoverableCa
         handDisplay.removeHoveredCard();
         switch(card.cardSubType) {
             case RUN:
-                battleState.setAction("RUNNING");
+                battleState.startRun();
+                deck.discardCard(card);
                 break;
         }
     }
@@ -251,15 +309,7 @@ public class BattleScreen extends BaseGameObject implements Screen, IHoverableCa
                 handDisplay.unHoverCard();
         }
     }
-
-    @Override
-    public void keyDown(int keycode) {
-        super.keyDown(keycode);
-        if (keycode == Input.Keys.SPACE && battleState.playerTurn) {
-            // Add a new card
-            handDisplay.addToHand(Card.GenerateRandomCard());
-        } else if (Input.Keys.A == keycode) {
-            battleState.curCycles = battleState.maxCycles;
-        }
+    public void endTurn() {
+        battleState.nextState();
     }
 }

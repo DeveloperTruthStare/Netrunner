@@ -1,5 +1,7 @@
 package com.smith.netrunner;
 
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 
 import java.util.ArrayList;
@@ -32,10 +34,24 @@ public class BaseGameObject {
     protected int x = 0, y = 0, width = 0, height = 0;
     protected boolean isActive;
     protected boolean isHovering = false;
+    protected BaseGameObject parent;
+    protected final BitmapFont font;
+    protected final GlyphLayout layout;
+
+    public BaseGameObject(RootApplication app, BaseGameObject parent) {
+        this.app = app;
+        this.parent = parent;
+        children = new ArrayList<>();
+        isActive = true;
+        font = new BitmapFont();
+        layout = new GlyphLayout();
+    }
     public BaseGameObject(RootApplication app) {
         this.app = app;
         children = new ArrayList<>();
         isActive = true;
+        font = new BitmapFont();
+        layout = new GlyphLayout();
     }
     public void draw(float dt) {
         if (!isActive) return;
@@ -147,5 +163,32 @@ public class BaseGameObject {
     }
     public void onClick() {
         System.out.println("Clicked");
+    }
+    public enum ALIGNMENT {
+        RIGHT, LEFT, TOP, BOTTOM, CENTER
+    }
+    protected void drawText(String text, float x, float y, ALIGNMENT align) {
+        layout.setText(font, text);
+        float fontX = x - (layout.width/2);
+        float fontY = y + (layout.height/2);
+
+        switch(align) {
+            case TOP:
+                fontY = y + layout.height;
+                break;
+            case BOTTOM:
+                fontY = y;
+                break;
+            case RIGHT:
+                fontX = x - layout.width;
+                break;
+            case LEFT:
+                fontX = x;
+                break;
+            case CENTER:
+                break;
+        }
+
+        font.draw(app.batch, layout, fontX, fontY);
     }
 }

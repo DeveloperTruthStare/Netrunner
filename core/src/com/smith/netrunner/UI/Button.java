@@ -33,7 +33,7 @@ public class Button extends BaseGameObject {
         shape.roundedRect(this.x, this.y, this.width, this.height, 20);
         shape.end();
         app.batch.begin();
-        font.draw(app.batch, text, this.x + 15, this.y+ (float) this.height /2 +5);
+        drawText(text, this.x + this.width/2, this.y + this.height/2, ALIGNMENT.CENTER);
     }
     public void setText(String text) {
         this.text = text;

@@ -65,6 +65,7 @@ public class RootApplication extends Game {
 			return false;
 		}
 	};
+
 	public SpriteBatch batch;
 	private GameState gameState;
 	private TitleScreen titleScreen;
@@ -72,12 +73,20 @@ public class RootApplication extends Game {
 	private BaseGameObject currentScreen;
 	@Override
 	public void create () {
+		// Set the input processor
 		Gdx.input.setInputProcessor(inputProcessor);
+		// Create sprite batch to draw to screen
 		batch = new SpriteBatch();
+
+		// Create the Game state
 		gameState = new GameState();
-		gameScreen = new GameScreen(this, gameState);
+
+		// Create Screens
+		gameScreen = new GameScreen(this);
 		titleScreen = new TitleScreen(this);
+
 		setScreen(titleScreen);
+
 		currentScreen = titleScreen;
 	}
 	public void startGame() {

@@ -4,12 +4,8 @@ import com.smith.netrunner.GameData.Card;
 import com.smith.netrunner.GameData.Runner;
 
 public class GameState {
-    public class Corporation {
-
-    }
 
     public Runner player;
-    public Corporation enemy;
     public GameState() {
         // Load Player Cards
         this.player = new Runner();

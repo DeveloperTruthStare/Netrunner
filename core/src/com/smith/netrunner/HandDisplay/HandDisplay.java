@@ -25,9 +25,20 @@ public class HandDisplay extends BaseGameObject {
         cardsInHand = new ArrayList<>();
         stage = new Stage(new ScreenViewport());
         cardImages = new ArrayList<>();
-
+    }
+    public void reset() {
+        cardImages.clear();
+        cardsInHand.clear();
+        stage.clear();
     }
 
+    public Card discard() {
+        if (cardsInHand.size() > 0) {
+            cardBeingHovered = 0;
+            return removeHoveredCard();
+        }
+        return null;
+    }
     @Override
     public void mouseMoved(int x, int y) {
         float width = Math.min(MAX_WIDTH, 100 * cardsInHand.size());

@@ -1,29 +1,42 @@
 package com.smith.netrunner.HardwareRig;
 
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.smith.netrunner.BaseGameObject;
 import com.smith.netrunner.GameData.Card;
 import com.smith.netrunner.RootApplication;
 
 public class HardwareView extends BaseGameObject {
-    public static Texture emptyHardwareImage;
-    public static Texture hoveredHardwareImage;
     private boolean hovered = false;
     private Card card;
 
+    private final Image defaultImage = new Image(new Texture("HardwareRig/emptySlot1x4.png"));
+    private final Stage stage = new Stage();
     public HardwareView(RootApplication app) {
         super(app);
         this.card = null;
-
-        if (null == emptyHardwareImage)
-            emptyHardwareImage = new Texture("HardwareRig/emptySlot1x4.png");
-        if (null == hoveredHardwareImage)
-            hoveredHardwareImage = new Texture("HardwareRig/hoveredEmptySlot1x4.png");
-        this.setSize(emptyHardwareImage.getWidth(), emptyHardwareImage.getHeight());
+        stage.addActor(defaultImage);
     }
     public void setCard(Card card) {
         this.card = card;
     }
+
+    public void reset() {
+        this.card = null;
+    }
+    @Override
+    public void setSize(int width, int height) {
+        super.setSize(width, height);
+        defaultImage.setSize(width, height);
+    }
+
+    @Override
+    public void setPosition(int x, int y) {
+        super.setPosition(x, y);
+        defaultImage.setPosition(x, y);
+    }
+
     @Override
     public void touchDragged(int screenX, int screenY, int pointer) {
         super.mouseMoved(screenX, screenY);
@@ -45,12 +58,7 @@ public class HardwareView extends BaseGameObject {
     public void draw(float delta) {
         super.draw(delta);
         if (!isActive) return;
-        if (null == card) {
-            if (hovered)
-                app.batch.draw(hoveredHardwareImage, this.x, this.y);
-            else
-                app.batch.draw(emptyHardwareImage, this.x, this.y);
-
-        }
+        if (card != null)
+            stage.draw();
     }
 }

@@ -7,15 +7,17 @@ import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.smith.netrunner.BaseGameObject;
 import com.smith.netrunner.RootApplication;
+import com.smith.netrunner.UI.ClickCallbackListener;
 
 public class InfoWindow extends BaseGameObject {
     private String data = "";
     BitmapFont font;
     MyShapeRenderer shapeRenderer;
     GlyphLayout layout;
-
-    public InfoWindow(RootApplication app) {
+    private ClickCallbackListener callback;
+    public InfoWindow(RootApplication app, ClickCallbackListener callback) {
         super(app);
+        this.callback = callback;
         font = new BitmapFont();
         shapeRenderer = new MyShapeRenderer();
         layout = new GlyphLayout(font, data);
@@ -41,5 +43,11 @@ public class InfoWindow extends BaseGameObject {
         app.batch.begin();
         // Draw text info
         font.draw(app.batch, layout, this.x + (this.width - layout.width)/2, this.y + (this.height + layout.height)/2);
+    }
+
+    @Override
+    public void onClick() {
+        super.onClick();
+        callback.onClick();
     }
 }
