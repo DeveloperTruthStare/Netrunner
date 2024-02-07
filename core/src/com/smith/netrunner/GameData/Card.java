@@ -1,7 +1,5 @@
 package com.smith.netrunner.GameData;
 
-import com.smith.netrunner.GameState;
-
 import java.util.Random;
 
 public class Card {
@@ -18,6 +16,7 @@ public class Card {
     public CardSubType cardSubType;
     public String cardText;
     public Ability ability;
+    public int value;
     public static Card GenerateIceBreaker() {
         Card card = new Card();
         card.cardType = CardType.HARDWARE;
@@ -37,12 +36,21 @@ public class Card {
     public static Card GenerateEvent() {
         Card card = new Card();
         card.cardType = CardType.EVENT;
+        card.cardSubType = CardSubType.ACTION;
+        card.cost = 1;
+        card.value = 5;
+        card.iconFilePath = "card_icons/yellowCard.png";
+        return card;
+    }
+    public static Card GenerateRunEvent() {
+        Card card = new Card();
+        card.cardType = CardType.EVENT;
         card.cardSubType = CardSubType.RUN;
         card.cost = 1;
         card.iconFilePath = "card_icons/greenCard.png";
         return card;
     }
-    public static Card GenerateRandomCard() {
+    public static Card GenerateRandomCard(WorldLine worldline) {
         Random rand = new Random();
         int card = rand.nextInt(0, 3);
         switch(card) {
@@ -55,6 +63,9 @@ public class Card {
             case 2:
                 System.out.println("Generating Event");
                 return GenerateEvent();
+            case 3:
+                System.out.println("Generating Run");
+                return GenerateRunEvent();
             default:
                 return GenerateIceBreaker();
         }

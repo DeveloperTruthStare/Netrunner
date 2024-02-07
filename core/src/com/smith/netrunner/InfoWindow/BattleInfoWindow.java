@@ -1,4 +1,4 @@
-package com.smith.netrunner;
+package com.smith.netrunner.InfoWindow;
 
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
@@ -7,7 +7,9 @@ import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.utils.SpriteDrawable;
+import com.smith.netrunner.BaseGameObject;
 import com.smith.netrunner.Corporation.Corporation;
+import com.smith.netrunner.RootApplication;
 import com.smith.netrunner.UI.Button;
 import com.smith.netrunner.UI.ClickCallbackListener;
 

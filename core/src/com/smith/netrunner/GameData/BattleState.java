@@ -7,7 +7,10 @@ import java.util.ArrayList;
 
 public class BattleState {
     public enum STATE {
-        LOADING, DISCARD, DRAW, PLAYER_ACTION, ENEMY_TURN, SELECTING_SERVER, DEALING_WITH_ICE, RUNNING, ACCEPTING_REWARDS
+        LOADING, DISCARD, DRAW, PLAYER_ACTION,
+        ENEMY_TURN,
+        SELECTING_SERVER, DEALING_WITH_ICE, RUNNING, ACCEPTING_REWARDS, POST_ACCEPT_REWARDS,
+        FINALIZING_BATTLE
     }
     private STATE state = STATE.LOADING;
     private final int maxCycles = 3;
@@ -25,7 +28,6 @@ public class BattleState {
                 this.state = STATE.DRAW;
                 break;
             case DRAW:
-            case ACCEPTING_REWARDS:
                 this.state = STATE.PLAYER_ACTION;
                 break;
             case PLAYER_ACTION:
@@ -34,10 +36,16 @@ public class BattleState {
             case DEALING_WITH_ICE:
                 this.state = STATE.ACCEPTING_REWARDS;
                 break;
+            case ACCEPTING_REWARDS:
+                this.state = STATE.POST_ACCEPT_REWARDS;
+                break;
+            case POST_ACCEPT_REWARDS:
+                this.state = STATE.PLAYER_ACTION;
+                break;
             case ENEMY_TURN:
                 nextTurn();
+                break;
         }
-        infoToDisplay = this.state.toString();
     }
     public STATE getState() {
         return this.state;
@@ -71,5 +79,8 @@ public class BattleState {
         turns++;
         state = STATE.DISCARD;
         curCycles = maxCycles;
+    }
+    public void endBattle() {
+        this.state = STATE.FINALIZING_BATTLE;
     }
 }

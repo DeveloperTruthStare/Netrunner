@@ -1,10 +1,10 @@
 package com.smith.netrunner.HealthBar;
 
 import com.badlogic.gdx.graphics.Texture;
+import com.smith.netrunner.BaseGameObject;
 import com.smith.netrunner.RootApplication;
 
-public class HealthBarView {
-    private RootApplication app;
+public class HealthBarView extends BaseGameObject {
     private int health;
     private final Texture playerHealthBar;
     private final Texture heartIcon;
@@ -12,6 +12,7 @@ public class HealthBarView {
 
 
     public HealthBarView(RootApplication app) {
+        super(app);
         this.app = app;
         this.health = 10;
         heartIcon = new Texture("health_icon.png");
@@ -21,6 +22,8 @@ public class HealthBarView {
     public void setHealth(int health) {
         this.health = health;
     }
+
+    @Override
     public void draw(float dt) {
         app.batch.draw(playerHealthBar, 20, 1000);
         for(int i = 0; i < 10; ++i) {

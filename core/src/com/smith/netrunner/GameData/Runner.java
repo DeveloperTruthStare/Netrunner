@@ -14,8 +14,10 @@ public class Runner {
     public CardCollection discardPile;
     public Card identityCard;
     public int money;
+    public int trace;
     public int health;
-    public Runner() {
+    public boolean hasServerLocation = false, hasDecryptedKey = false, hasEncryptedKey = false, hasDecryptionAlgo = false;
+    public Runner(WorldLine worldline) {
         this.money = 50;
         this.health = 10;
     }

@@ -1,12 +1,20 @@
 package com.smith.netrunner;
 
+import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.math.Matrix4;
+import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.smith.netrunner.Screens.GameScreen;
 import com.smith.netrunner.Screens.TitleScreen;
+import com.sun.org.apache.xpath.internal.operations.Or;
+
+import java.util.Vector;
 
 public class RootApplication extends Game {
 	public InputProcessor inputProcessor = new InputProcessor() {
@@ -60,40 +68,38 @@ public class RootApplication extends Game {
 
 		@Override
 		public boolean scrolled(float amountX, float amountY) {
-
 			currentScreen.scrolled(amountX, amountY);
 			return false;
 		}
 	};
 
 	public SpriteBatch batch;
-	private GameState gameState;
 	private TitleScreen titleScreen;
 	private GameScreen gameScreen;
 	private BaseGameObject currentScreen;
-	@Override
+	private OrthographicCamera camera;
+	private FitViewport fitViewport;
 	public void create () {
 		// Set the input processor
 		Gdx.input.setInputProcessor(inputProcessor);
 		// Create sprite batch to draw to screen
 		batch = new SpriteBatch();
 
-		// Create the Game state
-		gameState = new GameState();
-
 		// Create Screens
 		gameScreen = new GameScreen(this);
 		titleScreen = new TitleScreen(this);
-
 		setScreen(titleScreen);
-
 		currentScreen = titleScreen;
+
 	}
 	public void startGame() {
 		setScreen(gameScreen);
 		currentScreen = gameScreen;
 	}
-
+	@Override
+	public void render() {
+		super.render();
+	}
 	@Override
 	public void dispose () {
 		batch.dispose();

@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.smith.netrunner.BaseGameObject;
+import com.smith.netrunner.GameData.Server;
 import com.smith.netrunner.RootApplication;
 import com.smith.netrunner.Target;
 import com.smith.netrunner.UI.ClickCallbackListener;
@@ -27,7 +28,7 @@ public class RunTarget extends BaseGameObject {
     public ShapeRenderer shapeRenderer;
     protected ClickCallbackListener clickCallback;
     protected Target target;
-
+    public Server server;
     public RunTarget(RootApplication app, ClickCallbackListener clickCallback) {
         super(app);
         this.clickCallback = clickCallback;
@@ -42,9 +43,11 @@ public class RunTarget extends BaseGameObject {
         target.setPosition(1320, 250);
         target.setActive(false);
         addChild(target);
-
     }
 
+    public void setServer(Server server) {
+        this.server = server;
+    }
     @Override
     public void setSize(int width, int height) {
         super.setSize(width, height);
@@ -54,6 +57,7 @@ public class RunTarget extends BaseGameObject {
     public void setPosition(int x, int y) {
         super.setPosition(x, y);
         serverImage.setPosition(x, y);
+        target.setPosition(1320, y + this.height/2);
     }
 
     @Override
@@ -76,18 +80,19 @@ public class RunTarget extends BaseGameObject {
         super.draw(dt);
     }
     public void setShowOutline(boolean value) {
-        showOutline = value;
+        showOutline = value && !server.hacked;
     }
     private int currentIce = -1;
     public void targetServer() {
         showTarget();
         currentIce = 0;
+        server.revealed = true;
     }
     public void unTarget() {
         target.setActive(false);
     }
     public Ice getActiveIce() {
-        if (installedIce.size() > currentIce) {
+        if (installedIce.size() > currentIce && currentIce != -1) {
             return installedIce.get(currentIce);
         }
         return null;
@@ -102,6 +107,7 @@ public class RunTarget extends BaseGameObject {
     @Override
     public void onClick() {
         super.onClick();
-        clickCallback.onClick();
+        if (!server.hacked)
+            clickCallback.onClick();
     }
 }

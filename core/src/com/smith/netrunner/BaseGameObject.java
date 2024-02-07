@@ -1,10 +1,13 @@
 package com.smith.netrunner;
 
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 
 import java.util.ArrayList;
+
+import javax.sound.sampled.Line;
 
 public class BaseGameObject {
     public class MyShapeRenderer extends ShapeRenderer {
@@ -31,6 +34,7 @@ public class BaseGameObject {
 
     protected RootApplication app;
     protected ArrayList<BaseGameObject> children;
+    private ArrayList<BaseGameObject> childrenToRemove;
     protected int x = 0, y = 0, width = 0, height = 0;
     protected boolean isActive;
     protected boolean isHovering = false;
@@ -42,6 +46,7 @@ public class BaseGameObject {
         this.app = app;
         this.parent = parent;
         children = new ArrayList<>();
+        childrenToRemove = new ArrayList<>();
         isActive = true;
         font = new BitmapFont();
         layout = new GlyphLayout();
@@ -51,9 +56,16 @@ public class BaseGameObject {
         children = new ArrayList<>();
         isActive = true;
         font = new BitmapFont();
+        font.getRegion().getTexture().setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
         layout = new GlyphLayout();
     }
     public void draw(float dt) {
+        if (null != childrenToRemove && childrenToRemove.size() > 0){
+            for (BaseGameObject child : childrenToRemove) {
+                children.remove(child);
+            }
+            childrenToRemove.clear();
+        }
         if (!isActive) return;
         for(BaseGameObject child : children) {
             child.draw(dt);
@@ -75,9 +87,7 @@ public class BaseGameObject {
             this.children.add(child);
     }
     public void removeChild(BaseGameObject child) {
-        if (!this.children.contains(child)) {
-            this.children.remove(child);
-        }
+        childrenToRemove.add(child);
     }
 
     public void keyDown(int keycode) {

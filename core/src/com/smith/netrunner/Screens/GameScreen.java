@@ -1,16 +1,15 @@
 package com.smith.netrunner.Screens;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.Texture;
 import com.smith.netrunner.BaseGameObject;
 import com.smith.netrunner.Corporation.Corporation;
 import com.smith.netrunner.GameData.Card;
-import com.smith.netrunner.GameState;
+import com.smith.netrunner.GameData.WorldLine;
+import com.smith.netrunner.HealthBar.HealthBarView;
 import com.smith.netrunner.RootApplication;
-import com.smith.netrunner.World;
+import com.smith.netrunner.GameData.World;
 
 import java.util.ArrayList;
 
@@ -19,16 +18,20 @@ public class GameScreen extends BaseGameObject implements Screen {
     private final BattleSelectScreen battleSelect;
     public final World world;
     public ArrayList<Card> deck;
+    private final HealthBarView hpView;
+
 
     public GameScreen(RootApplication app) {
         super(app);
+        hpView = new HealthBarView(app);
         battleScreen = new BattleScreen(app, this);
         battleSelect = new BattleSelectScreen(app, this);
         battleScreen.setActive(false);
 
         this.addChild(battleSelect);
         this.addChild(battleScreen);
-        world = new World();
+        this.addChild(hpView);
+        world = new World(new WorldLine());
         deck = new ArrayList<>();
         loadDefaultDeck();
     }
@@ -41,6 +44,8 @@ public class GameScreen extends BaseGameObject implements Screen {
         deck.add(Card.GenerateConsole());
         deck.add(Card.GenerateIceBreaker());
         deck.add(Card.GenerateIceBreaker());
+        deck.add(Card.GenerateRunEvent());
+        deck.add(Card.GenerateRunEvent());
 
     }
     public void attackSelected() {
