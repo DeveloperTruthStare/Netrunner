@@ -2,6 +2,9 @@ package com.smith.netrunner.Screens;
 
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Animation;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.smith.netrunner.BaseGameObject;
 import com.smith.netrunner.InfoWindow.BattleInfoWindow;
@@ -18,6 +21,8 @@ public class BattleSelectScreen extends BaseGameObject  {
     private final MyShapeRenderer shapeRenderer;
     private final GameScreen gameManager;
     private final BattleInfoWindow infoWindow;
+    private Animation<TextureRegion> playerIndicatorAnim;
+    private float stateTime = 0.0f;
     ArrayList<Texture> icons;
     private final ClickCallbackListener attackClick = new ClickCallbackListener() {
         @Override
@@ -31,6 +36,18 @@ public class BattleSelectScreen extends BaseGameObject  {
         gameManager = gameScreen;
         shapeRenderer = new MyShapeRenderer();
         infoWindow = new BattleInfoWindow(app, this, attackClick);
+
+        Texture playerIndicator = new Texture("BattleSelect/playerIndicatorSpriteSheet.png");
+        TextureRegion[][] tmp = TextureRegion.split(playerIndicator, 115, 115);
+        TextureRegion[] sprites = new TextureRegion[16];
+        int index = 0;
+        for(int i = 0; i < 4; ++i) {
+            for(int j = 0; j < 4; ++j) {
+                sprites[index++] = tmp[i][j];
+            }
+        }
+        playerIndicatorAnim = new Animation<>((float)1/24, sprites);
+
         addChild(infoWindow);
         icons = new ArrayList<>();
         icons.add(new Texture("BattleScreen/tiles/hexEnabled.png"));
@@ -46,6 +63,8 @@ public class BattleSelectScreen extends BaseGameObject  {
         super.draw(delta);
         if (!isActive) return;
 
+        stateTime += delta;
+
         app.batch.end();
         shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
         shapeRenderer.setColor(0, 0, 0, 1);
@@ -55,8 +74,6 @@ public class BattleSelectScreen extends BaseGameObject  {
 
         Corporation[][] map = getMap();
         Point2D pos = gameManager.world.playerPosition;
-
-
 
         for(int i = 0; i < gameManager.world.worldSize; ++i) {
             for(int j = 0; j < gameManager.world.worldSize; ++j) {
@@ -68,9 +85,7 @@ public class BattleSelectScreen extends BaseGameObject  {
                     y -= 50;
 
                 Texture toDraw = icons.get(0);
-                if (pos.getX() == i && pos.getY() == j) {
-                    toDraw = icons.get(3);
-                } else if (map[i][j].revealed) {
+                if (map[i][j].revealed) {
                     if (!map[i][j].battled) {
                         if (map[i][j].type == Corporation.CORPORATION_TYPE.EVENT) {
                             toDraw = icons.get(5);
@@ -92,6 +107,11 @@ public class BattleSelectScreen extends BaseGameObject  {
                 app.batch.draw(toDraw, x, y, 115, 115);
             }
         }
+        int playerX = (int)pos.getX() * 90 + 100;
+        int playerY = (int)pos.getY() * 100 + 100;
+        if (pos.getX() % 2 == 0)
+            playerY += 50;
+        app.batch.draw(playerIndicatorAnim.getKeyFrame(stateTime, true), playerX, playerY);
         drawText("Money: " + gameManager.world.player.money, 960, 1050, ALIGNMENT.CENTER);
     }
 

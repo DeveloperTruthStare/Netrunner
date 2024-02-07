@@ -25,6 +25,9 @@ public class BattleInfoWindow extends BaseGameObject {
     private final Button attackButton;
     private Image mainIcon;
 
+    private String corporationName = "";
+    private String corporationTypeDisplayText = "";
+
     public BattleInfoWindow(RootApplication app, BaseGameObject parent, ClickCallbackListener onClick) {
         super(app, parent);
         this.corporation = Corporation.GenerateEmpty();
@@ -38,15 +41,33 @@ public class BattleInfoWindow extends BaseGameObject {
         attackButton.setText("Attack");
         addChild(attackButton);
         mainIcon = new Image();
-        mainIcon.setPosition((int)OFF_SET.getX() + WIDTH/2 - 50, (int)OFF_SET.getY()+HEIGHT-70);
+        mainIcon.setPosition((int)OFF_SET.getX() + (float) WIDTH /2 - 50, (int)OFF_SET.getY()+HEIGHT-70);
     }
 
 
     public void setCorporation(Corporation corp) {
         this.corporation = corp;
-        boolean activeButton = !corp.battled && corp.revealed;
-        attackButton.setActive(activeButton);
+        if (corporation.revealed) {
+            corporationName = "Corporation Name: " + corporation.corporationName;
+            corporationTypeDisplayText = corporation.corporationType;
+            if (!corporation.battled || corporation.isBoss) {
+                attackButton.setActive(true);
+            } else {
+                attackButton.setActive(false);
+            }
+        } else {
+            attackButton.setActive(false);
+            corporationName = "Unable to access";
+            corporationTypeDisplayText = "Signal Degraded";
+        }
 
+        if (corp.isBoss && corp.battled) {
+            attackButton.setText("Go to next Region");
+        } else if (corp.type == Corporation.CORPORATION_TYPE.EVENT) {
+            attackButton.setText("Begin Event");
+        } else {
+            attackButton.setText("Attack");
+        }
     }
 
     @Override
@@ -62,9 +83,9 @@ public class BattleInfoWindow extends BaseGameObject {
         shapeRenderer.end();
         app.batch.begin();
 
-        drawText(corporation.corporationName, (float) WIDTH /2, HEIGHT-50, ALIGNMENT.CENTER);
+        drawText(corporationName, (float) WIDTH /2, HEIGHT-50, ALIGNMENT.CENTER);
         drawText("Corporation Type: ", 10, HEIGHT-500, ALIGNMENT.LEFT);
-        drawText(corporation.corporationType, WIDTH-10, HEIGHT-500, ALIGNMENT.RIGHT);
+        drawText(corporationTypeDisplayText, WIDTH-10, HEIGHT-500, ALIGNMENT.RIGHT);
 
         if (Corporation.images.containsKey(corporation.type)) {
             mainIcon.setDrawable(new SpriteDrawable(new Sprite(Corporation.images.get(corporation.type))));
