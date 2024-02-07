@@ -45,6 +45,14 @@ public class BattleSelectScreen extends BaseGameObject  {
     public void draw(float delta) {
         super.draw(delta);
         if (!isActive) return;
+
+        app.batch.end();
+        shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
+        shapeRenderer.setColor(0, 0, 0, 1);
+        shapeRenderer.roundedRect(90, 40, 675, 815, 20);
+        shapeRenderer.end();
+        app.batch.begin();
+
         Corporation[][] map = getMap();
         Point2D pos = gameManager.world.playerPosition;
 
