@@ -77,7 +77,9 @@ public class RootApplication extends Game {
 	private TitleScreen titleScreen;
 	private GameScreen gameScreen;
 	private BaseGameObject currentScreen;
-	private OrthographicCamera camera;
+
+	private final static int WORLD_WIDTH = 1920, WORLD_HEIGHT = 1080;
+	private OrthographicCamera mainCamera;
 	private FitViewport fitViewport;
 	public void create () {
 		// Set the input processor
@@ -91,6 +93,10 @@ public class RootApplication extends Game {
 		setScreen(titleScreen);
 		currentScreen = titleScreen;
 
+		mainCamera = new OrthographicCamera(WORLD_WIDTH, WORLD_HEIGHT);
+		mainCamera.position.set(mainCamera.viewportWidth / 2f, mainCamera.viewportHeight / 2f, 0);
+		mainCamera.update();
+
 	}
 	public void startGame() {
 		setScreen(gameScreen);
@@ -99,6 +105,7 @@ public class RootApplication extends Game {
 	@Override
 	public void render() {
 		super.render();
+		batch.setProjectionMatrix(mainCamera.combined);
 	}
 	@Override
 	public void dispose () {

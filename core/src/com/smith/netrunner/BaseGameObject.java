@@ -38,7 +38,7 @@ public class BaseGameObject {
     protected int x = 0, y = 0, width = 0, height = 0;
     protected boolean isActive;
     protected boolean isHovering = false;
-    protected BaseGameObject parent;
+    public BaseGameObject parent;
     protected final BitmapFont font;
     protected final GlyphLayout layout;
 

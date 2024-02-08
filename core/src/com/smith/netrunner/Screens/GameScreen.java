@@ -3,6 +3,7 @@ package com.smith.netrunner.Screens;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.math.Vector2;
 import com.smith.netrunner.BaseGameObject;
 import com.smith.netrunner.Corporation.Corporation;
 import com.smith.netrunner.GameData.Card;
@@ -59,8 +60,10 @@ public class GameScreen extends BaseGameObject implements Screen {
             battleSelect.setActive(false);
             battleScreen.setActive(true);
             battleScreen.setCorporation(world.getCurrentCorporation());
-
         }
+    }
+    public void setPlayerPosition(Vector2 pos) {
+        world.setPlayerPosition(pos);
     }
     public void quitBattle() {
         battleSelect.setActive(true);

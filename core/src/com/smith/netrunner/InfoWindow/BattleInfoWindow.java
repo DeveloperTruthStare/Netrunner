@@ -9,7 +9,9 @@ import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.utils.SpriteDrawable;
 import com.smith.netrunner.BaseGameObject;
 import com.smith.netrunner.Corporation.Corporation;
+import com.smith.netrunner.GameData.World;
 import com.smith.netrunner.RootApplication;
+import com.smith.netrunner.Screens.GameScreen;
 import com.smith.netrunner.UI.Button;
 import com.smith.netrunner.UI.ClickCallbackListener;
 
@@ -62,7 +64,12 @@ public class BattleInfoWindow extends BaseGameObject {
         }
 
         if (corp.isBoss && corp.battled) {
-            attackButton.setText("Go to next Region");
+            World world = ((GameScreen)parent.parent).world;
+            if (world.player.hasDecryptedKey || (world.player.hasEncryptedKey && world.player.hasDecryptionAlgo)) {
+                attackButton.setText("Go to next Region");
+            } else {
+                attackButton.setText("Need decrypted key to access firewall");
+            }
         } else if (corp.type == Corporation.CORPORATION_TYPE.EVENT) {
             attackButton.setText("Begin Event");
         } else {
