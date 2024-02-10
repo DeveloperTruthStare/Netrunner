@@ -6,9 +6,9 @@ import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.smith.netrunner.BaseGameObject;
 import com.smith.netrunner.GameData.Card;
 import com.smith.netrunner.RootApplication;
+import com.smith.netrunner.UIState;
 
 public class HardwareView extends BaseGameObject {
-    private boolean hovered = false;
     private Card card;
 
     private final Image defaultImage = new Image(new Texture("HardwareRig/emptySlot1x4.png"));
@@ -41,15 +41,11 @@ public class HardwareView extends BaseGameObject {
     public void touchDragged(int screenX, int screenY, int pointer) {
         super.mouseMoved(screenX, screenY);
         if (!isActive) return;
-        if (screenX > this.x && screenX < this.x + this.width && (1080-screenY) > this.y && (1080-screenY) < this.y + this.height)
-            hovered = true;
-        else
-            hovered = false;
+        if (screenX > this.x && screenX < this.x + this.width &&
+                (1080-screenY) > this.y && (1080-screenY) < this.y + this.height)
+            UIState.hoveredHardware = this;
     }
 
-    public boolean getHoveredStatus() {
-        return hovered;
-    }
     public Card getInstalledHardware() {
         return this.card;
     }
@@ -60,5 +56,10 @@ public class HardwareView extends BaseGameObject {
         if (!isActive) return;
         if (card != null)
             stage.draw();
+
+        if (this == UIState.hoveredHardware) {
+
+        }
+
     }
 }

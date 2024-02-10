@@ -13,9 +13,10 @@ public class Deck {
         trash = new ArrayList<>();
     }
     public Card drawFromDeck() {
-        if (deck.size() == 0) {
+        if (deck.size() == 0)
             shuffle();
-        }
+        if (deck.size() == 0)
+            return null;
         return deck.remove(0);
     }
     public void loadDeck(ArrayList<Card> deck) {
@@ -24,6 +25,9 @@ public class Deck {
     }
     public void discardCard(Card card) {
         discard.add(card);
+    }
+    public void trashCard(Card card) {
+        trash.add(card);
     }
     public void discardCards(ArrayList<Card> toDiscard) {
         discard.addAll(toDiscard);

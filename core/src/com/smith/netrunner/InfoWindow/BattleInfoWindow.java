@@ -25,7 +25,7 @@ public class BattleInfoWindow extends BaseGameObject {
     private final Point2D OFF_SET;
 
     private final Button attackButton;
-    private Image mainIcon;
+    private final Image mainIcon;
 
     private String corporationName = "";
     private String corporationTypeDisplayText = "";

@@ -6,6 +6,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.smith.netrunner.BaseGameObject;
 import com.smith.netrunner.GameData.Card;
 import com.smith.netrunner.RootApplication;
+import com.smith.netrunner.UIState;
 
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
@@ -49,23 +50,11 @@ public class HardwareRig extends BaseGameObject {
         stage.draw();
         super.draw(delta);
     }
-    public int getHoveredHardware() {
-        int hoveredHardware = -1;
-        for(int i = 0; i < hardwareLength; ++i) {
-            if (baseHardwareViews.get(i).getHoveredStatus()) {
-                hoveredHardware = i;
-                break;
-            }
-        }
-        return hoveredHardware;
-    }
     public boolean installOnHovered(Card hardware) {
         if (hardware.cardType != Card.CardType.HARDWARE) return false;
-        int hoveredHardware = getHoveredHardware();
-        if (-1 == hoveredHardware) return false;
-        if (null != baseHardwareViews.get(hoveredHardware).getInstalledHardware()) return false;
-        baseHardwareViews.get(hoveredHardware).setCard(hardware);
-
+        if (null == UIState.hoveredHardware) return false;
+        if (null != UIState.hoveredHardware.getInstalledHardware()) return false;
+        UIState.hoveredHardware.setCard(hardware);
         return true;
     }
 }

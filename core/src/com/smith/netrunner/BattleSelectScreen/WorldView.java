@@ -240,10 +240,6 @@ public class WorldView extends BaseGameObject {
             playerY += 50;
         spriteBatch.draw(playerIndicatorAnim.getKeyFrame(stateTime, true), playerX + offSet.x, playerY + offSet.y);
     }
-
-    private void drawMoving(float delta) {
-
-    }
     @Override
     public void keyDown(int keycode) {
         super.keyDown(keycode);
@@ -276,6 +272,5 @@ public class WorldView extends BaseGameObject {
                 this.state = WorldState.ZOOMING_OUT;
                 break;
         }
-        System.out.println(this.state);
     }
 }

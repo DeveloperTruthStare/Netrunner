@@ -10,6 +10,7 @@ import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.smith.netrunner.GameData.Card;
 import com.smith.netrunner.RootApplication;
 import com.smith.netrunner.BaseGameObject;
+import com.smith.netrunner.UIState;
 
 import java.util.ArrayList;
 
@@ -19,7 +20,6 @@ public class HandDisplay extends BaseGameObject {
     private Texture cardTexture;
     private final ArrayList<Image> cardImages;
     private final Stage stage;
-    private int cardBeingHovered = -1;
     public HandDisplay(RootApplication app) {
         super(app);
         cardsInHand = new ArrayList<>();
@@ -32,12 +32,8 @@ public class HandDisplay extends BaseGameObject {
         stage.clear();
     }
 
-    public Card discard() {
-        if (cardsInHand.size() > 0) {
-            cardBeingHovered = 0;
-            return removeHoveredCard();
-        }
-        return null;
+    public Card discardTopCard() {
+        return removeCard(0);
     }
     @Override
     public void mouseMoved(int x, int y) {
@@ -45,14 +41,16 @@ public class HandDisplay extends BaseGameObject {
         float wPerCard = width / Math.max(1, cardsInHand.size()-1);
         float minW = 885 - width/2;
         if (y > 200 || x < minW || x > minW + width + wPerCard) {
-            cardBeingHovered = -1;
-        } else {
-            for(int i = 0; i < cardsInHand.size(); ++i) {
-                if (x < (i+1) * wPerCard + minW) {
-                    cardBeingHovered = i;
-                    return;
+            UIState.hoveredCard = null;
+            UIState.hoveredCardIndex = -1;
+            return;
+        }
 
-                }
+        for(int i = 0; i < cardsInHand.size(); ++i) {
+            if (x < (i+1) * wPerCard + minW) {
+                UIState.hoveredCard = cardsInHand.get(i);
+                UIState.hoveredCardIndex = i;
+                return;
             }
         }
     }
@@ -71,25 +69,17 @@ public class HandDisplay extends BaseGameObject {
         cardImages.add(image);
         stage.addActor(image);
     }
-    public Card getHoveredCard() {
-        if (-1 == cardBeingHovered) return null;
-        return cardsInHand.get(cardBeingHovered);
-    }
-    public void unHoverCard() {
-        this.cardBeingHovered = -1;
-    }
-    public Card removeHoveredCard() {
-        if (-1 == cardBeingHovered) return null;
-        // Remove from arrays
-        Card card = cardsInHand.remove(cardBeingHovered);
-        Image removedCard = cardImages.remove(cardBeingHovered);
+    public Card removeCard(int index) {
+        if (index >= cardsInHand.size())
+            return null;
         for(Actor actor : stage.getActors()) {
-            if (actor == removedCard) {
+            if (cardImages.get(index) == actor) {
                 actor.remove();
+                cardImages.remove(index);
+                return cardsInHand.remove(index);
             }
         }
-        cardBeingHovered = -1;
-        return card;
+        return null;
     }
 
     public void draw(float delta) {
@@ -121,12 +111,12 @@ public class HandDisplay extends BaseGameObject {
                 yVal -= step;
             }
         }
-        if (cardBeingHovered != -1) {
-            cardImages.get(cardBeingHovered).setZIndex(100);
-            cardImages.get(cardBeingHovered).setSize(300, 450);
-            cardImages.get(cardBeingHovered).setPosition(minW + (cardBeingHovered * wPerCard), 0);
-            cardImages.get(cardBeingHovered).setRotation(0);
-
+        if (UIState.hoveredCard != null && cardsInHand.contains(UIState.hoveredCard)) {
+            int index = cardsInHand.indexOf(UIState.hoveredCard);
+            cardImages.get(index).setZIndex(100);
+            cardImages.get(index).setSize(300, 450);
+            cardImages.get(index).setPosition(minW + (index * wPerCard), 0);
+            cardImages.get(index).setRotation(0);
         }
         stage.draw();
     }

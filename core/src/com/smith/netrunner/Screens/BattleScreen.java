@@ -22,6 +22,7 @@ import com.smith.netrunner.UI.Button;
 import com.smith.netrunner.UI.ClickCallbackListener;
 import com.smith.netrunner.UI.ImageButton;
 import com.smith.netrunner.UI.RewardWindow;
+import com.smith.netrunner.UIState;
 
 import java.util.ArrayList;
 
@@ -393,7 +394,7 @@ public class BattleScreen extends BaseGameObject implements IHoverableCallback {
 
         if (timeSinceStart > 0.2) {
             timeSinceStart = 0;
-            Card card = handDisplay.discard();
+            Card card = handDisplay.discardTopCard();
             if (card == null) {
                 battleState.nextState();
             } else {
@@ -444,52 +445,53 @@ public class BattleScreen extends BaseGameObject implements IHoverableCallback {
     }
 
 
-    private void installHardware(Card card) {
-        if (hardwareRig.installOnHovered(card)) {
-            battleState.curCycles -= card.cost;
-            handDisplay.removeHoveredCard();
-        } else {
-            handDisplay.unHoverCard();
+    private void installHardware() {
+        if (hardwareRig.installOnHovered(UIState.hoveredCard)) {
+            battleState.curCycles -= UIState.hoveredCard.cost;
+            handDisplay.removeCard(UIState.hoveredCardIndex);
+            UIState.reset();
         }
     }
-    private void startEvent(Card card) {
+    private void startEvent() {
         // Start the event if we're not hovering the hardware rig
-        if (-1 != hardwareRig.getHoveredHardware()) {
-            handDisplay.unHoverCard();
+        if (null != UIState.hoveredHardware) {
+            UIState.reset();
             return;
         }
-        battleState.curCycles -= card.cost;
-        handDisplay.removeHoveredCard();
-        switch(card.cardSubType) {
+        battleState.curCycles -= UIState.hoveredCard.cost;
+        handDisplay.removeCard(UIState.hoveredCardIndex);
+        switch(UIState.hoveredCard.cardSubType) {
             case RUN:
                 battleState.startRun();
-                deck.discardCard(card);
+                deck.discardCard(UIState.hoveredCard);
                 break;
             case ACTION:
-                ((GameScreen)parent).world.player.money += card.value;
+                ((GameScreen)parent).world.player.money += UIState.hoveredCard.value;
+                deck.trashCard(UIState.hoveredCard);
         }
+        UIState.reset();
     }
     @Override
     public void touchUp(int screenX, int screenY, int pointer, int button) {
-        super.touchUp(screenX, screenY, pointer, button);
         if (!isActive) return;
+        super.touchUp(screenX, screenY, pointer, button);
 
-        // Get the hovered card
-        Card hoveredCard = handDisplay.getHoveredCard();
-        if (null == hoveredCard) return;
-        if (!battleState.canPerformAction(hoveredCard.cardType, hoveredCard.cost)){
-            handDisplay.unHoverCard();
+        // Was a card being hovered when the touch down happened?
+        if (null == UIState.hoveredCard) return;
+        // Can we perform this action?
+        if (!battleState.canPerformAction(UIState.hoveredCard.cardType, UIState.hoveredCard.cost)) {
+            UIState.reset();
             return;
         }
-        switch(hoveredCard.cardType) {
+
+        switch(UIState.hoveredCard.cardType) {
             case HARDWARE:
-                installHardware(hoveredCard);
+                installHardware();
                 break;
             case EVENT:
-                startEvent(hoveredCard);
+                startEvent();
                 break;
             default:
-                handDisplay.unHoverCard();
         }
     }
     public void endTurn() {
