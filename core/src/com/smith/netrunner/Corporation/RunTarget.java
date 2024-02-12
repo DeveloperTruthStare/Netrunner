@@ -1,52 +1,77 @@
 package com.smith.netrunner.Corporation;
 
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Animation;
+import com.badlogic.gdx.graphics.g2d.Sprite;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
+import com.badlogic.gdx.scenes.scene2d.utils.SpriteDrawable;
 import com.smith.netrunner.BaseGameObject;
 import com.smith.netrunner.GameData.Server;
+import com.smith.netrunner.GameData.ServerType;
 import com.smith.netrunner.RootApplication;
 import com.smith.netrunner.Target;
 import com.smith.netrunner.UI.ClickCallbackListener;
+import com.smith.netrunner.UIState;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 public class RunTarget extends BaseGameObject {
+    public static final Map<ServerType, Texture> images;
+    static {
+        Map<ServerType, Texture> aMap = new HashMap<>();
+        aMap.put(ServerType.BANK_RECORDS, new Texture("corporation/icons/bankIcon.png"));
+        aMap.put(ServerType.RND, new Texture("corporation/icons/fileIcon.png"));
+        aMap.put(ServerType.HONEY_POT, new Texture("corporation/icons/bankIcon.png"));
+        aMap.put(ServerType.KEY_DATABASE, new Texture("corporation/icons/fileIcon.png"));
 
-    public enum ServerType {
-        RND, BANK_RECORDS, HONEY_POT, KEY_DATABASE
+        images = Collections.unmodifiableMap(aMap);
     }
-    public class Ice {
-        public boolean isRevealed = false;
-    }
-    public ServerType serverType = ServerType.BANK_RECORDS;
-    public ArrayList<Ice> installedIce;
-    protected Image serverImage;
-    protected Stage stage;
-    public boolean showOutline = false;
-    public ShapeRenderer shapeRenderer;
-    protected ClickCallbackListener clickCallback;
-    protected Target target;
-    public Server server;
-    public RunTarget(RootApplication app, ClickCallbackListener clickCallback) {
+
+    private final Image serverImage;
+    private final Stage stage;
+    private final Target target;
+    private final Server server;
+    private final Animation<TextureRegion> playerIndicatorAnim;
+    private float stateTime = 0.0f;
+    private Texture iceTexture;
+    private ArrayList<Image> iceImages;
+    public RunTarget(RootApplication app, Server server) {
         super(app);
-        this.clickCallback = clickCallback;
-        installedIce = new ArrayList<>();
-        serverImage = new Image( new Texture("HardwareRig/emptySlot1x4.png"));
+        this.server = server;
+
+        serverImage = new Image( new Texture("corporation/icons/unknownServerIcon.png"));
+
         this.stage = new Stage();
         stage.addActor(serverImage);
-        shapeRenderer = new ShapeRenderer();
+
         setSize((int)serverImage.getWidth(), (int)serverImage.getHeight());
 
         target = new Target(app);
         target.setPosition(1320, 250);
         target.setActive(false);
         addChild(target);
-    }
 
-    public void setServer(Server server) {
-        this.server = server;
+        Texture playerIndicator = new Texture("BattleSelect/playerIndicatorSpriteSheet.png");
+        TextureRegion[][] tmp = TextureRegion.split(playerIndicator, 115, 115);
+        TextureRegion[] sprites = new TextureRegion[16];
+        int index = 0;
+        for (int i = 0; i < 4; ++i) {
+            for (int j = 0; j < 4; ++j) {
+                sprites[index++] = tmp[i][j];
+            }
+        }
+        playerIndicatorAnim = new Animation<>((float) 1 / 24, sprites);
+
+        iceTexture = new Texture("iceIcons/ice.png");
+    }
+    public Server getServer() {
+        return this.server;
     }
     @Override
     public void setSize(int width, int height) {
@@ -63,51 +88,35 @@ public class RunTarget extends BaseGameObject {
     @Override
     public void draw(float dt) {
         if (!isActive) return;
-        app.batch.end();
-        shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
-        if (!isHovering) {
-            shapeRenderer.setColor(0, 0, 0, 1);
-        } else {
-            shapeRenderer.setColor(1, 1, 1, 1);
-        }
-        if (showOutline)
-            shapeRenderer.rect(this.x, this.y, this.width, this.height);
-        shapeRenderer.end();
-        app.batch.begin();
-
         stage.draw();
+
+        if (isDragging && !server.hacked) {
+            stateTime += dt;
+            app.batch.draw(playerIndicatorAnim.getKeyFrame(stateTime, true),
+                    this.x + (float)this.width/2, this.y + (float)this.height/2);
+        }
 
         super.draw(dt);
     }
-    public void setShowOutline(boolean value) {
-        showOutline = value && !server.hacked;
-    }
-    private int currentIce = -1;
     public void targetServer() {
-        showTarget();
-        currentIce = 0;
+        target.LerpSize(1000, 200, 0.25f);
+        target.setActive(true);
         server.revealed = true;
+        this.serverImage.setDrawable(new SpriteDrawable(new Sprite(images.get(server.serverType))));
     }
     public void unTarget() {
         target.setActive(false);
     }
-    public Ice getActiveIce() {
-        if (installedIce.size() > currentIce && currentIce != -1) {
-            return installedIce.get(currentIce);
-        }
-        return null;
-    }
-    public boolean hasAccess() {
-        return currentIce >= installedIce.size();
-    }
-    private void showTarget() {
-        target.LerpSize(1000, 200, 0.25f);
-        target.setActive(true);
+    @Override
+    public void onDragEnter() {
+        super.onDragEnter();
+        UIState.hoveredServer = this;
     }
     @Override
-    public void onClick() {
-        super.onClick();
-        if (!server.hacked)
-            clickCallback.onClick();
+    public void onDragExit() {
+        super.onDragExit();
+        if (UIState.hoveredServer == this) {
+            UIState.hoveredServer = null;
+        }
     }
 }

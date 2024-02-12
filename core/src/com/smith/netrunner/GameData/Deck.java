@@ -29,9 +29,6 @@ public class Deck {
     public void trashCard(Card card) {
         trash.add(card);
     }
-    public void discardCards(ArrayList<Card> toDiscard) {
-        discard.addAll(toDiscard);
-    }
     private void shuffle() {
         while(discard.size() > 0) {
             deck.add(discard.remove(0));

@@ -8,22 +8,24 @@ public class Server {
     public static Server GenerateBankRecords(WorldLine worldline) {
         Server server = new Server();
         server.reward = Reward.GenerateBankReward(worldline);
+        server.serverType = ServerType.BANK_RECORDS;
         return server;
     }
     public static Server GenerateHoneyPot(WorldLine worldline) {
         Server server = new Server();
         server.reward = Reward.GenerateTrapReward(worldline);
+        server.serverType = ServerType.HONEY_POT;
         return server;
     }
     public static Server GenerateRND(WorldLine worldline) {
         Server server = new Server();
-        server.serverType = RunTarget.ServerType.RND;
+        server.serverType = ServerType.RND;
         server.reward = Reward.GenerateRNDReward(worldline);
         return server;
     }
     public static Server GenerateKeyServer(WorldLine worldline, int type) {
         Server server = new Server();
-        server.serverType = RunTarget.ServerType.KEY_DATABASE;
+        server.serverType = ServerType.KEY_DATABASE;
         switch(type) {
             case 0:
                 // Boss - Proxy Server Location
@@ -48,7 +50,7 @@ public class Server {
         }
         return server;
     }
-    public RunTarget.ServerType serverType;
+    public ServerType serverType;
     public Reward reward;
     public ArrayList<Ice> installedIce;
     public boolean revealed;

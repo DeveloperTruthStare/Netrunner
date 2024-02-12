@@ -125,14 +125,13 @@ public class BattleScreen extends BaseGameObject implements IHoverableCallback {
         public void onClick() {
             if (battleState.getState() == BattleState.STATE.ACCEPTING_REWARDS) {
                 // Accept rewards
-                Reward reward = corporationServers.get(battleState.currentServer).server.reward;
-                rewards.add(reward);
-                corporationServers.get(battleState.currentServer).server.hacked = true;
+                rewards.add(battleState.selectedServer.getServer().reward);
+                battleState.selectedServer.getServer().hacked = true;
 
                 // Reset to waiting_for_player_action
                 battleState.nextState();
                 infoWindow.setActive(false);
-                corporationServers.get(battleState.currentServer).unTarget();
+                battleState.selectedServer.unTarget();
                 battleState.infoToDisplay = "";
             }
         }
@@ -153,6 +152,7 @@ public class BattleScreen extends BaseGameObject implements IHoverableCallback {
     private RewardWindow rewardWindow;
     public ArrayList<Reward> rewards;
     private Reward rewardSum;
+
 
     public BattleScreen(RootApplication app, GameScreen gameScreen) {
         super(app, gameScreen);
@@ -185,9 +185,6 @@ public class BattleScreen extends BaseGameObject implements IHoverableCallback {
         cyclesTexture[2] = new Texture("CycleCounter/2x3Cycles.png");
         cyclesTexture[3] = new Texture("CycleCounter/3x3Cycles.png");
 
-        // Create Background image and add it to the stage
-        //Image hardwareBackground = new Image(new Texture("BattleScreen/battleBackground.png"));
-        //stage.addActor(hardwareBackground);
 
         bannerImage = new Image(new Texture("BattleScreen/battleBanner.png"));
         bannerImage.setPosition(-1920, 980);
@@ -201,7 +198,6 @@ public class BattleScreen extends BaseGameObject implements IHoverableCallback {
         addChild(endTurnButton);
         addChild(infoWindow);
         addChild(rewardWindow);
-
 
         acceptMoneyButton = new Button(app, acceptMoneyCallback);
         acceptTraceButton = new Button(app, acceptTraceCallback);
@@ -228,6 +224,7 @@ public class BattleScreen extends BaseGameObject implements IHoverableCallback {
         deck.loadDeck(((GameScreen)parent).deck);
     }
     ArrayList<ClickCallbackListener> listeners = new ArrayList<>();
+
     public void setCorporation(Corporation corp) {
         listeners.clear();
         for(RunTarget target : corporationServers) {
@@ -236,23 +233,7 @@ public class BattleScreen extends BaseGameObject implements IHoverableCallback {
         corporationServers.clear();
         rewards.clear();
         for(int i = 0; i < corp.servers.size(); ++i) {
-            int finalI = i;
-             ClickCallbackListener l = new ClickCallbackListener() {
-                @Override
-                public void onClick() {
-                    if (battleState.getState() == BattleState.STATE.SELECTING_SERVER) {
-                        battleState.selectServer(finalI);
-                        for(RunTarget server : corporationServers) {
-                            server.setShowOutline(false);
-                        }
-                        corporationServers.get(finalI).targetServer();
-
-                    }
-                }
-            };
-            listeners.add(l);
-            RunTarget target = new RunTarget(app, l);
-            target.setServer(corp.servers.get(i));
+            RunTarget target = new RunTarget(app, corp.servers.get(i));
             target.setPosition(1320, 200 + 200 * i);
             corporationServers.add(target);
             addChild(target);
@@ -271,14 +252,17 @@ public class BattleScreen extends BaseGameObject implements IHoverableCallback {
 
         // Draw remaining Cycles Texture
         app.batch.draw(cyclesTexture[battleState.curCycles], 20, 80);
-        update(delta);
 
         if (!battleState.infoToDisplay.isEmpty()) {
             infoWindow.setData(battleState.infoToDisplay);
             infoWindow.setActive(true);
             infoWindow.setPosition(1920/2 - 170, 1080/2 - 50);
             infoWindow.setSize(340, 100);
+        } else {
+            infoWindow.setActive(false);
         }
+
+        update(delta);
     }
 
     public void update(float delta) {
@@ -294,72 +278,18 @@ public class BattleScreen extends BaseGameObject implements IHoverableCallback {
                 break;
             case PLAYER_ACTION:
                 break;
-            case SELECTING_SERVER:
-                for(RunTarget server : corporationServers) {
-                    server.setShowOutline(true);
-                }
+            case SELECTING_ATTACKER:
+                selectingAttacker(delta);
                 break;
             case DEALING_WITH_ICE:
-                if (corporationServers.get(battleState.currentServer).hasAccess()) {
-                    battleState.nextState();
-                }
-                RunTarget.Ice ice = corporationServers.get(battleState.currentServer).getActiveIce();
-
+                battleState.nextState();
                 break;
             case ACCEPTING_REWARDS:
                 // Show window for rewards
                 battleState.infoToDisplay = "Server Access Granted, Here are the rewards";
                 break;
             case POST_ACCEPT_REWARDS:
-                boolean unHackedServer = false;
-                for(RunTarget corp : corporationServers) {
-                    if (!corp.server.hacked) {
-                        unHackedServer = true;
-                    }
-                }
-                if (unHackedServer) {
-                    battleState.nextState();
-                } else {
-                    battleState.endBattle();
-                    rewardSum = new Reward();
-                    for(Reward reward : rewards) {
-                        rewardSum.add(reward);
-                    }
-                    rewardsToAccept = 0;
-                    acceptMoneyButton.setText(rewardSum.money + " Credits");
-                    rewardWindow.addButton(acceptMoneyButton);
-                    rewardsToAccept++;
-                    if (rewardSum.trace > 0) {
-                        rewardWindow.addButton(acceptTraceButton);
-                        acceptTraceButton.setText("You got " + rewardSum.trace + " additional traces");
-                        rewardsToAccept++;
-                    }
-                    if (rewardSum.proxyServer) {
-                        rewardsToAccept++;
-                        rewardWindow.addButton(proxyServerButton);
-                    }
-                    if (rewardSum.decryptedKey) {
-                        rewardsToAccept++;
-                        rewardWindow.addButton(decryptedKeyButton);
-                    }
-                    if (rewardSum.encryptedKey) {
-                        rewardsToAccept++;
-                        rewardWindow.addButton(encryptedKeyButton);
-                    }
-                    if (rewardSum.decryptionAlgorithm) {
-                        rewardsToAccept++;
-                        rewardWindow.addButton(decryptionAlgoButton);
-                    }
-                    if (rewardSum.bossLocation) {
-                        rewardsToAccept++;
-                        rewardWindow.addButton(bossLocationButton);
-                    }
-                    if (rewardSum.cards.size() > 0) {
-                        rewardsToAccept++;
-                        rewardWindow.addButton(cardButton);
-                    }
-                    rewardWindow.setActive(true);
-                }
+                postAcceptRewards();
                 break;
             case ENEMY_TURN:
                 enemyTurnUpdate(delta);
@@ -367,12 +297,25 @@ public class BattleScreen extends BaseGameObject implements IHoverableCallback {
             case FINALIZING_BATTLE:
                 if (rewardsToAccept == 0) {
                     rewardWindow.setActive(false);
-                    ((GameScreen)parent).quitBattle();
+                    ((GameScreen) parent).quitBattle();
                 }
-                // Show Battle Rewards Window
                 break;
         }
-
+    }
+    private void  selectingAttacker(float delta) {
+        timeSinceStart += delta;
+        if (battleState.selectedServer.getServer().installedIce.size() == 0) {
+            battleState.acceptRewards();
+        } else if (hardwareRig.getNumberOfInstalledHardware() == 0) {
+            battleState.infoToDisplay = "No Installed Hardware, Jacking out " + (int)(2 - timeSinceStart);
+            if (timeSinceStart > 2) {
+                battleState.jackOut();
+                battleState.selectedServer.unTarget();
+                timeSinceStart = 0;
+            }
+        } else if (UIState.selectedIceBreaker != null) {
+            battleState.selectAttacker(UIState.selectedIceBreaker);
+        }
     }
     private void enemyTurnUpdate(float delta) {
         System.out.println("Doing enemy turn");
@@ -403,7 +346,7 @@ public class BattleScreen extends BaseGameObject implements IHoverableCallback {
         }
     }
     private int cardsDrawn = 0;
-    private final int cardsToDraw = 5;
+
     public void drawHandUpdate(float delta) {
         timeSinceStart += delta;
         // Play Animations here
@@ -416,6 +359,7 @@ public class BattleScreen extends BaseGameObject implements IHoverableCallback {
             } else {
                 handDisplay.addToHand(card);
                 cardsDrawn++;
+                int cardsToDraw = 5;
                 if (cardsDrawn == cardsToDraw) {
                     battleState.nextState();
                     cardsDrawn = 0;
@@ -458,16 +402,23 @@ public class BattleScreen extends BaseGameObject implements IHoverableCallback {
             UIState.reset();
             return;
         }
-        battleState.curCycles -= UIState.hoveredCard.cost;
-        handDisplay.removeCard(UIState.hoveredCardIndex);
         switch(UIState.hoveredCard.cardSubType) {
             case RUN:
-                battleState.startRun();
-                deck.discardCard(UIState.hoveredCard);
+                if (UIState.hoveredServer != null) {
+                    battleState.startRun(UIState.hoveredServer);
+                    UIState.hoveredServer.targetServer();
+                    deck.discardCard(UIState.hoveredCard);
+                    handDisplay.removeCard(UIState.hoveredCardIndex);
+                    battleState.curCycles -= UIState.hoveredCard.cost;
+
+                    UIState.selectedIceBreaker = null;
+                }
                 break;
             case ACTION:
                 ((GameScreen)parent).world.player.money += UIState.hoveredCard.value;
                 deck.trashCard(UIState.hoveredCard);
+                handDisplay.removeCard(UIState.hoveredCardIndex);
+                battleState.curCycles -= UIState.hoveredCard.cost;
         }
         UIState.reset();
     }
@@ -477,7 +428,10 @@ public class BattleScreen extends BaseGameObject implements IHoverableCallback {
         super.touchUp(screenX, screenY, pointer, button);
 
         // Was a card being hovered when the touch down happened?
-        if (null == UIState.hoveredCard) return;
+        if (null == UIState.hoveredCard) {
+            UIState.reset();
+            return;
+        }
         // Can we perform this action?
         if (!battleState.canPerformAction(UIState.hoveredCard.cardType, UIState.hoveredCard.cost)) {
             UIState.reset();
@@ -496,5 +450,57 @@ public class BattleScreen extends BaseGameObject implements IHoverableCallback {
     }
     public void endTurn() {
         battleState.nextState();
+    }
+    private void postAcceptRewards() {
+        boolean unHackedServer = false;
+        for(RunTarget corp : corporationServers) {
+            if (!corp.getServer().hacked) {
+                unHackedServer = true;
+                break;
+            }
+        }
+        if (unHackedServer) {
+            battleState.nextState();
+        } else {
+            battleState.endBattle();
+            rewardSum = new Reward();
+            for(Reward reward : rewards) {
+                rewardSum.add(reward);
+            }
+            rewardsToAccept = 0;
+            acceptMoneyButton.setText(rewardSum.money + " Credits");
+            rewardWindow.addButton(acceptMoneyButton);
+            rewardsToAccept++;
+            if (rewardSum.trace > 0) {
+                rewardWindow.addButton(acceptTraceButton);
+                acceptTraceButton.setText("You got " + rewardSum.trace + " additional traces");
+                rewardsToAccept++;
+            }
+            if (rewardSum.proxyServer) {
+                rewardsToAccept++;
+                rewardWindow.addButton(proxyServerButton);
+            }
+            if (rewardSum.decryptedKey) {
+                rewardsToAccept++;
+                rewardWindow.addButton(decryptedKeyButton);
+            }
+            if (rewardSum.encryptedKey) {
+                rewardsToAccept++;
+                rewardWindow.addButton(encryptedKeyButton);
+            }
+            if (rewardSum.decryptionAlgorithm) {
+                rewardsToAccept++;
+                rewardWindow.addButton(decryptionAlgoButton);
+            }
+            if (rewardSum.bossLocation) {
+                rewardsToAccept++;
+                rewardWindow.addButton(bossLocationButton);
+            }
+            if (rewardSum.cards.size() > 0) {
+                rewardsToAccept++;
+                rewardWindow.addButton(cardButton);
+            }
+            rewardWindow.setActive(true);
+        }
     }
 }

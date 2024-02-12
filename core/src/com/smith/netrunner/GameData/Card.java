@@ -10,6 +10,7 @@ public class Card {
         ICE_BREAKER, CONSOLE, RESOURCE, RUN, ACTION
     }
     public String iconFilePath;
+    public String hardwareIconFilePath;
     public String cardName;
     public int cost;
     public CardType cardType;
@@ -31,6 +32,7 @@ public class Card {
         card.cardSubType = CardSubType.CONSOLE;
         card.cost = 1;
         card.iconFilePath = "card_icons/blueCard.png";
+        card.hardwareIconFilePath = "HardwareRig/hardwareIcons/consoleExtension.png";
         return card;
     }
     public static Card GenerateEvent() {

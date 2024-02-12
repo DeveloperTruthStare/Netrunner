@@ -139,6 +139,23 @@ public class BaseGameObject {
 
         for(BaseGameObject gameObject : children)
             gameObject.touchDragged(screenX, screenY, pointer);
+
+        if (screenX > this.x && (1080 - screenY) > this.y && screenX < this.x + this.width && (1080 - screenY) < this.y + this.height) {
+            if (!isDragging) {
+                onDragEnter();
+            }
+        } else {
+            if (isDragging){
+                onDragExit();
+            }
+        }
+    }
+    public boolean isDragging = false;
+    public void onDragEnter() {
+        isDragging = true;
+    }
+    public void onDragExit() {
+        isDragging = false;
     }
 
     public void mouseMoved(int screenX, int screenY) {
