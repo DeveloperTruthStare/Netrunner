@@ -2,6 +2,7 @@ package com.smith.netrunner.Screens;
 
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.smith.netrunner.BackgroundManager;
@@ -12,6 +13,7 @@ import com.smith.netrunner.GameData.BattleState;
 import com.smith.netrunner.GameData.Card;
 import com.smith.netrunner.GameData.Deck;
 import com.smith.netrunner.GameData.IHoverableCallback;
+import com.smith.netrunner.GameData.Ice;
 import com.smith.netrunner.GameData.Reward;
 import com.smith.netrunner.HandDisplay.HandDisplay;
 import com.smith.netrunner.HardwareRig.HardwareRig;
@@ -110,8 +112,6 @@ public class BattleScreen extends BaseGameObject implements IHoverableCallback {
     };
     private final Button cardButton;
     private int rewardsToAccept;
-
-
     private ClickCallbackListener onClickEndTurn  = new ClickCallbackListener() {
         @Override
         public void onClick() {
@@ -162,7 +162,7 @@ public class BattleScreen extends BaseGameObject implements IHoverableCallback {
         background = new BackgroundManager(app);
         stage = new Stage();
 
-        battleState = new BattleState();
+        battleState = new BattleState(gameScreen.world);
 
         infoWindow = new InfoWindow(app, onInfoClick);
         rewardWindow = new RewardWindow(app, this);
@@ -213,10 +213,14 @@ public class BattleScreen extends BaseGameObject implements IHoverableCallback {
         bossLocationButton.setText("Reveal Firewall address");
         cardButton = new Button(app, cardCallback);
         cardButton.setText("Select card to add to deck");
+
+        moveSpeed.add(new Vector2(0, 10));
+        moveSpeed.add(new Vector2(40, 0));
+        moveSpeed.add(new Vector2(-40, 0));
+        moveSpeed.add(new Vector2(0, -10));
     }
 
     public void reset() {
-        background.reset();
         hardwareRig.reset();
         handDisplay.reset();
         battleState.reset();
@@ -251,7 +255,7 @@ public class BattleScreen extends BaseGameObject implements IHoverableCallback {
         super.draw(delta);
 
         // Draw remaining Cycles Texture
-        app.batch.draw(cyclesTexture[battleState.curCycles], 20, 80);
+        app.batch.draw(cyclesTexture[battleState.curCycles], 30, 35);
 
         if (!battleState.infoToDisplay.isEmpty()) {
             infoWindow.setData(battleState.infoToDisplay);
@@ -282,7 +286,7 @@ public class BattleScreen extends BaseGameObject implements IHoverableCallback {
                 selectingAttacker(delta);
                 break;
             case DEALING_WITH_ICE:
-                battleState.nextState();
+                dealWithIce(delta);
                 break;
             case ACCEPTING_REWARDS:
                 // Show window for rewards
@@ -302,6 +306,58 @@ public class BattleScreen extends BaseGameObject implements IHoverableCallback {
                 break;
         }
     }
+    int dealWithIceState = 0;
+    ArrayList<Vector2> moveSpeed = new ArrayList<>();
+
+    private void dealWithIce(float delta) {
+        if (battleState.selectedAttacker.playAttackAnimation(delta)) {
+            int iceIndex = battleState.selectedServer.getServer().installedIce.size() - 1;
+            Ice ice =  battleState.selectedServer.getServer().installedIce.get(iceIndex);
+            Card card = battleState.selectedAttacker.getInstalledHardware();
+            int damage = card.attack;
+            if ((card.function == Card.IceBreakerFunction.FUNCTION_1 && ice.function == Ice.IceFunction.FUNCTION_2) ||
+                    (card.function == Card.IceBreakerFunction.FUNCTION_2 && ice.function == Ice.IceFunction.FUNCTION_3) ||
+                    (card.function == Card.IceBreakerFunction.FUNCTION_3 && ice.function == Ice.IceFunction.FUNCTION_4) ||
+                    (card.function == Card.IceBreakerFunction.FUNCTION_4 && ice.function == Ice.IceFunction.FUNCTION_1)) {
+                damage *= 2;
+            } else if ((card.function == Card.IceBreakerFunction.FUNCTION_1 && ice.function == Ice.IceFunction.FUNCTION_4) ||
+                    (card.function == Card.IceBreakerFunction.FUNCTION_4 && ice.function == Ice.IceFunction.FUNCTION_3) ||
+                    (card.function == Card.IceBreakerFunction.FUNCTION_3 && ice.function == Ice.IceFunction.FUNCTION_2) ||
+                    (card.function == Card.IceBreakerFunction.FUNCTION_2 && ice.function == Ice.IceFunction.FUNCTION_1)){
+                damage /= 2;
+            }
+            ice.health -= damage;
+            switch(((GameScreen)parent).world.player.runnerClass) {
+                case IRONCLAD:
+                    switch(card.developer) {
+                        case SELF_MADE:
+                            switch(card.function) {
+                                case FUNCTION_1:
+                                    ((GameScreen)parent).world.player.health -= 1;
+                                    break;
+                                case FUNCTION_2:
+                                    ((GameScreen)parent).world.player.health -= 1;
+                                    break;
+                                case FUNCTION_3:
+                                    ((GameScreen)parent).world.player.health += 1;
+                                    break;
+                                case FUNCTION_4:
+
+                                    break;
+                            }
+                            break;
+                    }
+                    break;
+            }
+            if (battleState.selectedServer.getServer().installedIce.get(iceIndex).health <= 0) {
+                battleState.nextState();
+            } else {
+                battleState.jackOut();
+            }
+            battleState.selectedServer.unTarget();
+
+        }
+    }
     private void  selectingAttacker(float delta) {
         timeSinceStart += delta;
         if (battleState.selectedServer.getServer().installedIce.size() == 0) {
@@ -315,6 +371,8 @@ public class BattleScreen extends BaseGameObject implements IHoverableCallback {
             }
         } else if (UIState.selectedIceBreaker != null) {
             battleState.selectAttacker(UIState.selectedIceBreaker);
+            dealWithIceState = 0;
+            timeSinceStart = 0;
         }
     }
     private void enemyTurnUpdate(float delta) {

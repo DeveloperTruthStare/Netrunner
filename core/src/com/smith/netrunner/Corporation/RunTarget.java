@@ -39,7 +39,7 @@ public class RunTarget extends BaseGameObject {
     private final Server server;
     private final Animation<TextureRegion> playerIndicatorAnim;
     private float stateTime = 0.0f;
-    private Texture iceTexture;
+    private final Texture iceTexture;
     private ArrayList<Image> iceImages;
     public RunTarget(RootApplication app, Server server) {
         super(app);
@@ -76,15 +76,19 @@ public class RunTarget extends BaseGameObject {
     @Override
     public void setSize(int width, int height) {
         super.setSize(width, height);
-        serverImage.setSize(width, height);
+        updateImage();
     }
     @Override
     public void setPosition(int x, int y) {
         super.setPosition(x, y);
-        serverImage.setPosition(x, y);
         target.setPosition(1320, y + this.height/2);
+        updateImage();
     }
 
+    private void updateImage() {
+        serverImage.setSize(115, 115);
+        serverImage.setPosition(x + this.width - 115, y);
+    }
     @Override
     public void draw(float dt) {
         if (!isActive) return;
@@ -94,6 +98,10 @@ public class RunTarget extends BaseGameObject {
             stateTime += dt;
             app.batch.draw(playerIndicatorAnim.getKeyFrame(stateTime, true),
                     this.x + (float)this.width/2, this.y + (float)this.height/2);
+        }
+
+        for(int i = 0; i < this.server.installedIce.size(); ++i) {
+            app.batch.draw(iceTexture, this.x - ((i+1) * 115), this.y);
         }
 
         super.draw(dt);

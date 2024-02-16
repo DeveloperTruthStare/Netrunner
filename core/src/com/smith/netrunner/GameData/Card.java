@@ -18,12 +18,55 @@ public class Card {
     public String cardText;
     public Ability ability;
     public int value;
+    public int attack;
+    public enum IceBreakerDeveloper {
+        DEVELOPER_1, DEVELOPER_2, DEVELOPER_3, SELF_MADE
+    }
+    public enum IceBreakerFunction {
+        FUNCTION_1, FUNCTION_2, FUNCTION_3, FUNCTION_4
+    }
+    public IceBreakerDeveloper developer;
+    public IceBreakerFunction function;
     public static Card GenerateIceBreaker() {
         Card card = new Card();
         card.cardType = CardType.HARDWARE;
         card.cardSubType = CardSubType.ICE_BREAKER;
         card.cost = 1;
-        card.iconFilePath = "card_icons/redCard.png";
+        card.value = 2;
+        card.attack = 2;
+        card.developer = IceBreakerDeveloper.DEVELOPER_1;
+        card.function = IceBreakerFunction.FUNCTION_1;
+        card.iconFilePath = "card_icons/iceBreaker1.png";
+        return card;
+    }
+    public static Card GenerateIceBreaker(int type) {
+        Card card = new Card();
+        card.cardType = CardType.HARDWARE;
+        card.cardSubType = CardSubType.ICE_BREAKER;
+        card.cost = 1;
+        card.attack = 2;
+        card.developer = IceBreakerDeveloper.SELF_MADE;
+        switch(type) {
+            case 0:
+                card.function = IceBreakerFunction.FUNCTION_1;
+                card.iconFilePath = "card_icons/iceBreaker1.png";
+                break;
+            case 1:
+                card.function = IceBreakerFunction.FUNCTION_2;
+                card.iconFilePath = "card_icons/iceBreaker2.png";
+                break;
+            case 2:
+                card.function = IceBreakerFunction.FUNCTION_3;
+                card.iconFilePath = "card_icons/iceBreaker3.png";
+                break;
+            case 3:
+            default:
+                card.function = IceBreakerFunction.FUNCTION_4;
+                card.iconFilePath = "card_icons/iceBreaker4.png";
+                break;
+        }
+
+
         return card;
     }
     public static Card GenerateConsole() {
@@ -31,8 +74,8 @@ public class Card {
         card.cardType = CardType.HARDWARE;
         card.cardSubType = CardSubType.CONSOLE;
         card.cost = 1;
-        card.iconFilePath = "card_icons/blueCard.png";
-        card.hardwareIconFilePath = "HardwareRig/hardwareIcons/consoleExtension.png";
+        card.iconFilePath = "card_icons/melos.png";
+        card.hardwareIconFilePath = "BattleScreen/hardware/consoles/consoleExtensionperspective.png";
         return card;
     }
     public static Card GenerateEvent() {
@@ -49,7 +92,7 @@ public class Card {
         card.cardType = CardType.EVENT;
         card.cardSubType = CardSubType.RUN;
         card.cost = 1;
-        card.iconFilePath = "card_icons/greenCard.png";
+        card.iconFilePath = "card_icons/runCard.png";
         return card;
     }
     public static Card GenerateRandomCard(WorldLine worldline) {

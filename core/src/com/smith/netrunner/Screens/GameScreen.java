@@ -24,7 +24,9 @@ public class GameScreen extends BaseGameObject implements Screen {
 
     public GameScreen(RootApplication app) {
         super(app);
-        hpView = new HealthBarView(app);
+        world = new World(new WorldLine());
+
+        hpView = new HealthBarView(app, this);
         battleScreen = new BattleScreen(app, this);
         battleSelect = new BattleSelectScreen(app, this);
         battleScreen.setActive(false);
@@ -32,19 +34,18 @@ public class GameScreen extends BaseGameObject implements Screen {
         this.addChild(battleSelect);
         this.addChild(battleScreen);
         this.addChild(hpView);
-        world = new World(new WorldLine());
         deck = new ArrayList<>();
         loadDefaultDeck();
     }
     private void loadDefaultDeck() {
         deck.add(Card.GenerateEvent());
         deck.add(Card.GenerateEvent());
-        deck.add(Card.GenerateEvent());
-        deck.add(Card.GenerateEvent());
         deck.add(Card.GenerateConsole());
         deck.add(Card.GenerateConsole());
-        deck.add(Card.GenerateIceBreaker());
-        deck.add(Card.GenerateIceBreaker());
+        deck.add(Card.GenerateIceBreaker(0));
+        deck.add(Card.GenerateIceBreaker(1));
+        deck.add(Card.GenerateIceBreaker(2));
+        deck.add(Card.GenerateIceBreaker(3));
         deck.add(Card.GenerateRunEvent());
         deck.add(Card.GenerateRunEvent());
 

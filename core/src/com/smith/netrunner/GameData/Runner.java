@@ -9,6 +9,9 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 
 public class Runner {
+    public enum RunnerClass {
+        IRONCLAD
+    }
     public CardCollection deck;
     public CardCollection hand;
     public CardCollection discardPile;
@@ -16,6 +19,7 @@ public class Runner {
     public int money;
     public int trace;
     public int health;
+    public RunnerClass runnerClass = RunnerClass.IRONCLAD;
     public boolean hasServerLocation = false, hasDecryptedKey = false, hasEncryptedKey = false, hasDecryptionAlgo = false;
     public Runner(WorldLine worldline) {
         this.money = 50;

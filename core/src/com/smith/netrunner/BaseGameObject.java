@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.math.Vector2;
 
 import java.util.ArrayList;
 
@@ -74,6 +75,9 @@ public class BaseGameObject {
     public void setPosition(int x, int y) {
         this.x = x;
         this.y = y;
+    }
+    public Vector2 getPosition() {
+        return new Vector2(this.x, this.y);
     }
     public void setActive(boolean active) {
         this.isActive = active;

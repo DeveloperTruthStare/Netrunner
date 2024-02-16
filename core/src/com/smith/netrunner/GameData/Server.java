@@ -6,25 +6,25 @@ import java.util.ArrayList;
 
 public class Server {
     public static Server GenerateBankRecords(WorldLine worldline) {
-        Server server = new Server();
+        Server server = new Server(worldline);
         server.reward = Reward.GenerateBankReward(worldline);
         server.serverType = ServerType.BANK_RECORDS;
         return server;
     }
     public static Server GenerateHoneyPot(WorldLine worldline) {
-        Server server = new Server();
+        Server server = new Server(worldline);
         server.reward = Reward.GenerateTrapReward(worldline);
         server.serverType = ServerType.HONEY_POT;
         return server;
     }
     public static Server GenerateRND(WorldLine worldline) {
-        Server server = new Server();
+        Server server = new Server(worldline);
         server.serverType = ServerType.RND;
         server.reward = Reward.GenerateRNDReward(worldline);
         return server;
     }
     public static Server GenerateKeyServer(WorldLine worldline, int type) {
-        Server server = new Server();
+        Server server = new Server(worldline);
         server.serverType = ServerType.KEY_DATABASE;
         switch(type) {
             case 0:
@@ -55,9 +55,10 @@ public class Server {
     public ArrayList<Ice> installedIce;
     public boolean revealed;
     public boolean hacked;
-    public Server() {
+    public Server(WorldLine worldline) {
         revealed = false;
         hacked = false;
         installedIce = new ArrayList<>();
+        installedIce.add(Ice.GenerateRandomIce(worldline));
     }
 }

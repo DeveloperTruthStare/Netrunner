@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
@@ -13,6 +14,8 @@ import com.smith.netrunner.GameData.Card;
 import com.smith.netrunner.RootApplication;
 import com.smith.netrunner.UIState;
 
+import java.util.ArrayList;
+
 public class HardwareView extends BaseGameObject {
     private Card card;
 
@@ -20,12 +23,13 @@ public class HardwareView extends BaseGameObject {
     private final Stage stage = new Stage();
     private final Animation<TextureRegion> playerIndicatorAnim;
     private float stateTime = 0.0f;
+    private Vector2 offSet;
 
     public HardwareView(RootApplication app) {
         super(app);
         this.card = null;
         stage.addActor(defaultImage);
-
+        offSet = new Vector2(0, 0);
         Texture playerIndicator = new Texture("BattleSelect/playerIndicatorSpriteSheet.png");
         TextureRegion[][] tmp = TextureRegion.split(playerIndicator, 115, 115);
         TextureRegion[] sprites = new TextureRegion[16];
@@ -36,6 +40,12 @@ public class HardwareView extends BaseGameObject {
             }
         }
         playerIndicatorAnim = new Animation<>((float) 1 / 24, sprites);
+
+        keyFrames.add(new Vector2(0, 20));
+        keyFrames.add(new Vector2(80, 0));
+        keyFrames.add(new Vector2(-80, 0));
+        keyFrames.add(new Vector2(0, -20));
+
     }
     public void setCard(Card card) {
         this.card = card;
@@ -45,6 +55,25 @@ public class HardwareView extends BaseGameObject {
         defaultImage.setDrawable(new SpriteDrawable(new Sprite(cardTexture)));
         defaultImage.setSize(cardTexture.getWidth(), cardTexture.getHeight());
 
+    }
+    private int animationState = 0;
+    private float timeSinceFrame = 0;
+    private final ArrayList<Vector2> keyFrames = new ArrayList<Vector2>();
+    public boolean playAttackAnimation(float delta) {
+        timeSinceFrame += delta;
+        if (timeSinceFrame >= 0.5) {
+            animationState++;
+            timeSinceFrame = 0;
+            if(animationState == keyFrames.size()) {
+                animationState = 0;
+                defaultImage.setPosition(this.x, this.y);
+                return true;
+            }
+        } else {
+            offSet = new Vector2(offSet.x + keyFrames.get(animationState).x * delta, offSet.y + keyFrames.get(animationState).y * delta);
+            defaultImage.setPosition(this.x + offSet.x, this.y + offSet.y);
+        }
+        return false;       // returns true if animation is over
     }
 
     public void reset() {

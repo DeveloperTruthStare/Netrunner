@@ -18,7 +18,6 @@ public class HardwareRig extends BaseGameObject {
     protected int hardwareLength = 3;
     private final ArrayList<HardwareView> baseHardwareViews;
     private final ArrayList<HardwareView> extendedHardwareViews;
-    private final Stage stage;
     public HardwareRig(RootApplication app) {
         super(app);
         baseHardwareViews = new ArrayList<>();
@@ -47,8 +46,6 @@ public class HardwareRig extends BaseGameObject {
         Image hardwareRig = new Image(new Texture("HardwareRig/hardwareRig1x3.png"));
         hardwareRig.setPosition(0, 0);
 
-        stage = new Stage();
-        stage.addActor(hardwareRig);
     }
     public int getNumberOfInstalledHardware() {
         int installedHardware = 0;
@@ -74,7 +71,6 @@ public class HardwareRig extends BaseGameObject {
     }
     @Override
     public void draw(float delta) {
-        stage.draw();
         super.draw(delta);
     }
     public boolean installOnHovered(Card hardware) {

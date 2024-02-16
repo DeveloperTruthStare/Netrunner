@@ -1,5 +1,6 @@
 package com.smith.netrunner.GameData;
 
+
 import com.smith.netrunner.Corporation.RunTarget;
 import com.smith.netrunner.HardwareRig.HardwareView;
 import com.smith.netrunner.Screens.GameScreen;
@@ -20,8 +21,11 @@ public class BattleState {
     public String infoToDisplay = "";
     public RunTarget selectedServer;
     public HardwareView selectedAttacker;
-    public BattleState() {
+    public World world;
+    public BattleState(World world)
+    {
         Instance = this;
+        this.world = world;
     }
     public void nextState() {
         switch(this.state) {
@@ -93,5 +97,8 @@ public class BattleState {
     }
     public void endBattle() {
         this.state = STATE.FINALIZING_BATTLE;
+    }
+    public void playCard(Card.IceBreakerDeveloper developer, Card.IceBreakerFunction function) {
+        System.out.println(world.player.runnerClass + ", " + developer.toString() + ", " + function.toString());
     }
 }

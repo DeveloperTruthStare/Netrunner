@@ -12,7 +12,7 @@ public class UIState {
     public static RunTarget hoveredServer;
     public static HardwareView selectedIceBreaker;
 
-
+    public static RunTarget attackingServer;
     public static HardwareView attackingIceBreaker;
 
     public static void reset() {
@@ -21,5 +21,6 @@ public class UIState {
         hoveredCard = null;
         hoveredServer = null;
         selectedIceBreaker = null;
+        attackingServer = null;
     }
 }
